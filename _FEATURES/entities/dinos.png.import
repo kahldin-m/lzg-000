@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://clk8ssqe7kwx0"
-path="res://.godot/imported/terrain.png-a716020b2115bb5ffce9d492537e3e63.ctex"
+uid="uid://bwv3fplj3ttc6"
+path="res://.godot/imported/dinos.png-e3240ad4316b30544021e10cda51b9ed.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://_FEATURES/the_world/terrain.png"
-dest_files=["res://.godot/imported/terrain.png-a716020b2115bb5ffce9d492537e3e63.ctex"]
+source_file="res://_FEATURES/entities/dinos.png"
+dest_files=["res://.godot/imported/dinos.png-e3240ad4316b30544021e10cda51b9ed.ctex"]
 
 [params]
 
