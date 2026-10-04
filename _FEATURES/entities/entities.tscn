@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cd8nhi36vhepn"]
+
+[ext_resource type="Script" uid="uid://hby65jfmswfd" path="res://_FEATURES/entities/entities.gd" id="1_k2n8t"]
+[ext_resource type="Texture2D" uid="uid://bwv3fplj3ttc6" path="res://_FEATURES/entities/dinos.png" id="2_qfm1q"]
+
+[node name="Entity" type="Node2D" unique_id=333275693]
+position = Vector2(-16, -16)
+script = ExtResource("1_k2n8t")
+metadata/_custom_type_script = "uid://hby65jfmswfd"
+
+[node name="Art" type="Sprite2D" parent="." unique_id=806037853 groups=["entities"]]
+texture = ExtResource("2_qfm1q")
+offset = Vector2(8, 8)
+hframes = 2
+vframes = 4
+frame = 7
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 64)

@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dscrgfl4xqthh"]
+
+[ext_resource type="Script" uid="uid://bynsb74gdpssk" path="res://_FEATURES/entities/nests.gd" id="1_nuybm"]
+[ext_resource type="Texture2D" uid="uid://c7e5fu1udka2c" path="res://_FEATURES/entities/nests.png" id="2_j6p4s"]
+
+[node name="Node2D" type="Node2D" unique_id=165726692]
+script = ExtResource("1_nuybm")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=970408143]
+position = Vector2(-8, -8)
+texture = ExtResource("2_j6p4s")
+hframes = 2
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 16)

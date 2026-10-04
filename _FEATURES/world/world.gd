@@ -1,3 +1,4 @@
+class_name World
 extends Node2D
 
 @export_category("DEBUG")
@@ -5,18 +6,18 @@ extends Node2D
 @export_category("Game Settings")
 @export var tick_time := 0.3
 @export var world_size: Vector2i = Vector2i(64, 32)
-@export var player_texture: Texture2D
-
-var vel_tex: Texture2D = preload("res://_FEATURES/entities/velo_00.png")
+@export var starting_tile: Vector2i = Vector2i(0, 0)
 # var bg_tile_texture: Texture2D = preload("res://_FEATURES/the_world/grass_01.png")
 
-var player: CharacterBody2D
-var player_sprite: Sprite2D
+var player: Entity
 var game_camera: Camera2D
 var direction: Vector2i = Vector2i.ZERO
-var entities: Array[Sprite2D] = []
+var entities: Array[Entity] = []
+
+@onready var decor_layer: TileMapLayer = $TileLayers/Decor
 
 const TILE_SIZE := 16
+const ENTITY_SCENE: PackedScene = preload("res://_FEATURES/entities/entities.tscn")
 const ENTITY_SPEED := 50
 const VELO_NAMES := [
 	"Frank",
@@ -39,28 +40,7 @@ func _ready() -> void:
 	setup_player()
 	setup_camera()
 	setup_timer()
-	queue_redraw()
 
-
-func _draw():
-	if not DEBUG_MODE:
-		return
-
-	for x in range(0, world_size.x + 1):
-		var x_pos := x * TILE_SIZE
-		draw_line(
-			Vector2(x_pos, 0),
-			Vector2(x_pos, world_size.y * TILE_SIZE),
-			Color(1, 1, 1, 0.3)
-		)
-
-	for y in range(0, world_size.y + 1):
-		var y_pos := y * TILE_SIZE
-		draw_line(
-			Vector2(0, y_pos),
-			Vector2(world_size.x * TILE_SIZE, y_pos),
-			Color(1, 1, 1, 0.3)
-		)
 
 
 func game_tick():
@@ -68,17 +48,38 @@ func game_tick():
 		return
 
 	# Flip sprite based on direction
-	if direction == Vector2i.LEFT:
-		player_sprite.flip_h = true
-	if direction == Vector2i.RIGHT:
-		player_sprite.flip_h = false
+	player.face_direction(direction)
 
-	#  Calculate movement in pixels
-	var motion := Vector2(direction) * TILE_SIZE
+	#  Calculate target tile
+	var current_tile := position_to_tile_address(player.position)
+	var target_tile := current_tile + direction
 
+	# Move if target tile is walkable
+	if is_tile_walkable(target_tile):
+		player.position = tile_address_to_position(target_tile)
+
+	# Check the tile we're on now
+	var player_address := decor_layer.local_to_map(
+		decor_layer.to_local(player.global_position)
+	)
+	var tile_data := decor_layer.get_cell_tile_data(player_address)
+
+	for y in range(-1, 2):
+		for x in range(-1, 2):
+			var check := player_address + Vector2i(x, y)
+			var data := decor_layer.get_cell_tile_data(check)
+
+			if data:
+				print(
+					"Cell ", check,
+					" | food: ", data.get_custom_data("has_food"),
+					" | walkable: ", data.get_custom_data("is_walkable")
+				)
+
+	if tile_data and tile_data.get_custom_data("has_food"):
+		decor_layer.erase_cell(player_address)
+		print("****OM NOM NOM!!!****")
 	# Check for collisions before moving
-	if not player.test_move(player.global_transform, motion):
-		player.move_and_collide(motion)
 
 	# player_address += direction
 	# player.position = tile_address_to_position(player_address)
@@ -86,22 +87,21 @@ func game_tick():
 	direction = Vector2i.ZERO
 
 	# Print actual player position
-	var player_address = position_to_tile_address(player.position)
 	print("Player at : ", player_address)
 
 	# Spawn velos!
-	# if entities.size() < 5:
-	# 	print("Not enough dinos! Hatching more!")
-	# 	entities.append(spawn_velo())
-	# else:
-	# 	print("Too many dinos... waiting.")
-	# 	var despawner = Timer.new()
-	# 	add_child(despawner)
-	# 	despawner.wait_time = tick_time * 1.5
-	# 	var target = entities.pop_front()
-	# 	despawner.timeout.connect(\
-	# 		func() -> void: despawn_velo(target, despawner))
-	# 	despawner.start()
+	if entities.size() < 5:
+		print("Not enough dinos! Hatching more!")
+		entities.append(spawn_entity())
+	else:
+		print("Too many dinos... waiting.")
+		var despawner = Timer.new()
+		add_child(despawner)
+		despawner.wait_time = tick_time * 1.5
+		var target: Entity = entities.pop_front()
+		despawner.timeout.connect(\
+			func() -> void: despawn_entity(target, despawner))
+		despawner.start()
 
 func _process(_delta: float) -> void:
 	if Input.is_action_pressed("move_up"):
@@ -141,22 +141,20 @@ func setup_timer() -> void:
 func setup_camera() -> void:
 	game_camera = Camera2D.new()
 	player.add_child(game_camera)
-	# Center the camera
-	# camera.position = world_size * TILE_SIZE / 2.0
+
 	game_camera.enabled = true
 	game_camera.zoom = Vector2(5, 5)
 
 # Setup Player
 func setup_player() -> void:
-	player = CharacterBody2D.new()
-	player_sprite = Sprite2D.new()
-	player_sprite.texture = player_texture
-	# player.scale = Vector2(1.5, 1.5)
-	player.add_child(player_sprite)
+	player = ENTITY_SCENE.instantiate()
+
+	player.is_pc = true
+	player.creature_type = 0
+	player.name = "Player"
 
 	@warning_ignore("integer_division")
-	player.position = tile_address_to_position(Vector2i(world_size.x / 2, world_size.y / 2))
-	player.position -= Vector2(-8, -8)
+	player.position = tile_address_to_position(starting_tile)
 
 	var player_collision = CollisionShape2D.new()
 	var collision_shape = RectangleShape2D.new()
@@ -164,6 +162,7 @@ func setup_player() -> void:
 	player_collision.shape = collision_shape
 
 	player.add_child(player_collision)
+
 	add_child(player)
 
 
@@ -172,25 +171,39 @@ func setup_player() -> void:
 func tile_address_to_position(address: Vector2i) -> Vector2:
 	return address * TILE_SIZE
 
+
 func position_to_tile_address(pos: Vector2) -> Vector2i:
 	return pos / TILE_SIZE
 
-func spawn_velo() -> Sprite2D:
-	var velo: Sprite2D = Sprite2D.new()
-	add_child(velo)
+
+func is_tile_walkable(address: Vector2i) -> bool:
+	var tile_data := decor_layer.get_cell_tile_data(address)
+
+	if tile_data == null:
+		return true
+
+	return tile_data.get_custom_data("is_walkable")
+
+
+func spawn_entity() -> Entity:
+	var entity: Entity = ENTITY_SCENE.instantiate()
+
 	@warning_ignore("integer_division")
 	var tile := Vector2i(\
 		randi_range(world_size.x / 10, world_size.x - 1),\
 		randi_range(world_size.y / 10, world_size.y - 1))
 
-	velo.position = tile_address_to_position(tile)
-	velo.name = VELO_NAMES[randi_range(0, VELO_NAMES.size() - 1)]
-	velo.texture = vel_tex
-	# velo.scale = Vector2(2, 2)
-	print("Velo \"" + velo.name + "\" spawned at: " + str(position_to_tile_address(velo.position)))
-	return velo
+	entity.position = tile_address_to_position(tile)
+	entity.creature_type = randi_range(0, 3)
+	entity.name = VELO_NAMES[randi_range(0, VELO_NAMES.size() - 1)]
 
-func despawn_velo(velo: Sprite2D, timer: Timer) -> void:
-	print(velo.name + " has just died! :(")
-	velo.queue_free()
+	add_child(entity)
+
+	print("Entity spawned. Type: ", entity.creature_type, " at: ", position_to_tile_address(entity.position))
+	return entity
+
+
+func despawn_entity(entity: Entity, timer: Timer) -> void:
+	print(entity.name + " has just died! :(")
+	entity.queue_free()
 	timer.call_deferred("queue_free")
