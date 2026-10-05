@@ -1,3 +1,4 @@
+
 class_name World
 extends Node2D
 
@@ -19,7 +20,7 @@ var entities: Array[Entity] = []
 const TILE_SIZE := 16
 const ENTITY_SCENE: PackedScene = preload("res://_FEATURES/entities/entities.tscn")
 const ENTITY_SPEED := 50
-const VELO_NAMES := [
+const ENTITY_NAMES := [
 	"Frank",
 	"Zelda",
 	"Bacon",
@@ -195,7 +196,7 @@ func spawn_entity() -> Entity:
 
 	entity.position = tile_address_to_position(tile)
 	entity.creature_type = randi_range(0, 3)
-	entity.name = VELO_NAMES[randi_range(0, VELO_NAMES.size() - 1)]
+	entity.name = ENTITY_NAMES[randi_range(0, ENTITY_NAMES.size() - 1)]
 
 	add_child(entity)
 
