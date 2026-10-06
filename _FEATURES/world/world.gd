@@ -1,11 +1,10 @@
-
 class_name World
 extends Node2D
 
 @export_category("DEBUG")
 @export var DEBUG_MODE: bool = false
 @export_category("Game Settings")
-@export var tick_time := 0.3
+@export var tick_time: float = 0.3
 @export var world_size: Vector2i = Vector2i(64, 32)
 @export var starting_tile: Vector2i = Vector2i(0, 0)
 # var bg_tile_texture: Texture2D = preload("res://_FEATURES/the_world/grass_01.png")
@@ -13,7 +12,6 @@ extends Node2D
 var player: Entity
 var game_camera: Camera2D
 var direction: Vector2i = Vector2i.ZERO
-var entities: Array[Entity] = []
 
 @onready var decor_layer: TileMapLayer = $TileLayers/Decor
 
@@ -65,17 +63,6 @@ func game_tick():
 	)
 	var tile_data := decor_layer.get_cell_tile_data(player_address)
 
-	for y in range(-1, 2):
-		for x in range(-1, 2):
-			var check := player_address + Vector2i(x, y)
-			var data := decor_layer.get_cell_tile_data(check)
-
-			if data:
-				print(
-					"Cell ", check,
-					" | food: ", data.get_custom_data("has_food"),
-					" | walkable: ", data.get_custom_data("is_walkable")
-				)
 
 	if tile_data and tile_data.get_custom_data("has_food"):
 		decor_layer.erase_cell(player_address)
@@ -90,19 +77,7 @@ func game_tick():
 	# Print actual player position
 	print("Player at : ", player_address)
 
-	# Spawn velos!
-	if entities.size() < 5:
-		print("Not enough dinos! Hatching more!")
-		entities.append(spawn_entity())
-	else:
-		print("Too many dinos... waiting.")
-		var despawner = Timer.new()
-		add_child(despawner)
-		despawner.wait_time = tick_time * 1.5
-		var target: Entity = entities.pop_front()
-		despawner.timeout.connect(\
-			func() -> void: despawn_entity(target, despawner))
-		despawner.start()
+
 
 func _process(_delta: float) -> void:
 	if Input.is_action_pressed("move_up"):
@@ -184,27 +159,3 @@ func is_tile_walkable(address: Vector2i) -> bool:
 		return true
 
 	return tile_data.get_custom_data("is_walkable")
-
-
-func spawn_entity() -> Entity:
-	var entity: Entity = ENTITY_SCENE.instantiate()
-
-	@warning_ignore("integer_division")
-	var tile := Vector2i(\
-		randi_range(world_size.x / 10, world_size.x - 1),\
-		randi_range(world_size.y / 10, world_size.y - 1))
-
-	entity.position = tile_address_to_position(tile)
-	entity.creature_type = randi_range(0, 3)
-	entity.name = ENTITY_NAMES[randi_range(0, ENTITY_NAMES.size() - 1)]
-
-	add_child(entity)
-
-	print("Entity spawned. Type: ", entity.creature_type, " at: ", position_to_tile_address(entity.position))
-	return entity
-
-
-func despawn_entity(entity: Entity, timer: Timer) -> void:
-	print(entity.name + " has just died! :(")
-	entity.queue_free()
-	timer.call_deferred("queue_free")
