@@ -18,31 +18,35 @@ var direction: Vector2i = Vector2i.ZERO
 const TILE_SIZE := 16
 const ENTITY_SCENE: PackedScene = preload("res://_FEATURES/entities/entities.tscn")
 const ENTITY_SPEED := 50
-const ENTITY_NAMES := [
-	"Frank",
-	"Zelda",
-	"Bacon",
-	"Juju",
-	"Antoine",
-	"Henrietta",
-	"Doris",
-	"Zulu",
-	"Delta",
-	"Romeo",
-	"Juliete",
-	"Casper",
-]
+
+signal hatch(tick_time: float)
+
 
 # ready, process and game_tick
 func _ready() -> void:
-	# setup_background()
 	setup_player()
 	setup_camera()
 	setup_timer()
 
 
+func _process(_delta: float) -> void:
+	if Input.is_action_pressed("move_up"):
+		direction = Vector2i.UP
+	if Input.is_action_pressed("move_down"):
+		direction = Vector2i.DOWN
+	if Input.is_action_pressed("move_left"):
+		direction = Vector2i.LEFT
+	if Input.is_action_pressed("move_right"):
+		direction = Vector2i.RIGHT
+	if Input.is_action_just_pressed("camera_zoomin"):
+		game_camera.zoom += Vector2(0.25, 0.25)
+	if Input.is_action_just_pressed("camera_zoomout"):
+		game_camera.zoom -= Vector2(0.25, 0.25)
+
 
 func game_tick():
+	hatch.emit(tick_time)
+	
 	if direction == Vector2i.ZERO:
 		return
 
@@ -78,22 +82,6 @@ func game_tick():
 	print("Player at : ", player_address)
 
 
-
-func _process(_delta: float) -> void:
-	if Input.is_action_pressed("move_up"):
-		direction = Vector2i.UP
-	if Input.is_action_pressed("move_down"):
-		direction = Vector2i.DOWN
-	if Input.is_action_pressed("move_left"):
-		direction = Vector2i.LEFT
-	if Input.is_action_pressed("move_right"):
-		direction = Vector2i.RIGHT
-	if Input.is_action_just_pressed("camera_zoomin"):
-		game_camera.zoom += Vector2(0.25, 0.25)
-	if Input.is_action_just_pressed("camera_zoomout"):
-		game_camera.zoom -= Vector2(0.25, 0.25)
-
-
 # SETUPS
 func setup_timer() -> void:
 	# Set up the tick timer
@@ -104,16 +92,6 @@ func setup_timer() -> void:
 	game_timer.start()
 
 
-# func setup_background() -> void:
-# 	for x in range(0, world_size.x):
-# 		for y in range(0, world_size.y):
-# 			var bg_tile: Sprite2D = Sprite2D.new()
-# 			bg_tile.texture = bg_tile_texture
-# 			add_child(bg_tile)
-# 			bg_tile.position = tile_address_to_position(Vector2i(x, y))
-# 			bg_tile.z_index = -1
-
-
 func setup_camera() -> void:
 	game_camera = Camera2D.new()
 	player.add_child(game_camera)
@@ -121,15 +99,15 @@ func setup_camera() -> void:
 	game_camera.enabled = true
 	game_camera.zoom = Vector2(5, 5)
 
+
 # Setup Player
 func setup_player() -> void:
 	player = ENTITY_SCENE.instantiate()
 
 	player.is_pc = true
-	player.creature_type = 0
+	player.entity_type = 0
 	player.name = "Player"
 
-	@warning_ignore("integer_division")
 	player.position = tile_address_to_position(starting_tile)
 
 	var player_collision = CollisionShape2D.new()

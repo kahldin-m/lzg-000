@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://c7e5fu1udka2c" path="res://_FEATURES/entities/nests.png" id="2_j6p4s"]
 
 [node name="Nest" type="Node2D" unique_id=165726692]
-position = Vector2(-16, -16)
 script = ExtResource("1_nuybm")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=970408143]

@@ -4,11 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://bwv3fplj3ttc6" path="res://_FEATURES/entities/dinos.png" id="2_qfm1q"]
 
 [node name="Entity" type="Node2D" unique_id=333275693]
-position = Vector2(-16, -16)
 script = ExtResource("1_k2n8t")
 metadata/_custom_type_script = "uid://hby65jfmswfd"
 
-[node name="Art" type="Sprite2D" parent="." unique_id=806037853 groups=["entities"]]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=806037853]
 texture = ExtResource("2_qfm1q")
 offset = Vector2(8, 8)
 hframes = 2

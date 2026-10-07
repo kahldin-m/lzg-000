@@ -9,6 +9,20 @@ extends Node2D
 var tile_address: Vector2i
 var animation_timer := 0.8
 const ANIMATION_SPEED := 0.5
+const ENTITY_NAMES := [
+	"Frank",
+	"Zelda",
+	"Bacon",
+	"Juju",
+	"Antoine",
+	"Henrietta",
+	"Doris",
+	"Zulu",
+	"Delta",
+	"Romeo",
+	"Juliete",
+	"Casper",
+]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

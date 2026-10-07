@@ -804,7 +804,7 @@ sources/0 = SubResource("TileSetAtlasSource_egspp")
 [node name="World" type="Node2D" unique_id=681732503]
 y_sort_enabled = true
 script = ExtResource("1_7x3tx")
-tick_time = 0.2
+tick_time = 0.8
 starting_tile = Vector2i(27, 25)
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1361892099]
@@ -817,19 +817,22 @@ y_sort_enabled = true
 [node name="Nest_Ramp" parent="Nests" unique_id=165726692 instance=ExtResource("4_a5qos")]
 y_sort_enabled = true
 position = Vector2(176, 336)
-nest_type = 3
+nest_size = 3
+entity_type = 3
 
 [node name="Nest_Velo" parent="Nests" unique_id=757852569 instance=ExtResource("4_a5qos")]
-position = Vector2(864, 480)
-nest_type = 1
+position = Vector2(848, 464)
+nest_size = 5
+entity_type = 1
 
 [node name="Nest_Compy" parent="Nests" unique_id=97628967 instance=ExtResource("4_a5qos")]
-position = Vector2(240, 64)
-nest_type = 2
+position = Vector2(176, 80)
+nest_size = 6
+entity_type = 2
 
 [node name="Nest_Trex" parent="Nests" unique_id=823120470 instance=ExtResource("4_a5qos")]
-position = Vector2(736, 128)
-nest_type = null
+position = Vector2(720, 112)
+nest_size = 3
 
 [node name="TileLayers" type="Node2D" parent="." unique_id=983266102]
 physics_interpolation_mode = 1
