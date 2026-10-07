@@ -13,7 +13,11 @@ var player: Entity
 var game_camera: Camera2D
 var direction: Vector2i = Vector2i.ZERO
 
-@onready var decor_layer: TileMapLayer = $TileLayers/Decor
+@onready var collision_layers: Array[TileMapLayer] = [
+	$TileLayers/Water,
+	$TileLayers/Plateaus,
+	$TileLayers/Decor
+]
 
 const TILE_SIZE := 16
 const ENTITY_SCENE: PackedScene = preload("res://_FEATURES/entities/entities.tscn")
@@ -46,7 +50,7 @@ func _process(_delta: float) -> void:
 
 func game_tick():
 	hatch.emit(tick_time)
-	
+
 	if direction == Vector2i.ZERO:
 		return
 
@@ -61,7 +65,9 @@ func game_tick():
 	if is_tile_walkable(target_tile):
 		player.position = tile_address_to_position(target_tile)
 
-	# Check the tile we're on now
+	# Check the tile we're on now for food
+	var decor_layer: TileMapLayer = collision_layers[2]
+	
 	var player_address := decor_layer.local_to_map(
 		decor_layer.to_local(player.global_position)
 	)
@@ -120,7 +126,6 @@ func setup_player() -> void:
 	add_child(player)
 
 
-
 # HELPERS
 func tile_address_to_position(address: Vector2i) -> Vector2:
 	return address * TILE_SIZE
@@ -131,9 +136,16 @@ func position_to_tile_address(pos: Vector2) -> Vector2i:
 
 
 func is_tile_walkable(address: Vector2i) -> bool:
-	var tile_data := decor_layer.get_cell_tile_data(address)
+	for layer in collision_layers:
+		var tile_data: TileData = layer.get_cell_tile_data(address)
 
-	if tile_data == null:
-		return true
+		if tile_data == null:
+			continue
 
-	return tile_data.get_custom_data("is_walkable")
+		if not tile_data.has_custom_data("is_walkable"):
+			continue
+			
+		if not tile_data.get_custom_data("is_walkable"):
+			return false
+
+	return true

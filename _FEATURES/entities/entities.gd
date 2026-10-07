@@ -2,6 +2,7 @@ class_name Entity
 extends Node2D
 
 @export_range(0, 3) var entity_type: int = 0
+@export var lifespan: float = 0.0
 @export var is_pc: bool = false
 
 @onready var sprite: Sprite2D = $Sprite2D
