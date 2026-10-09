@@ -2,10 +2,14 @@ class_name Entity
 extends Node2D
 
 @export_range(0, 3) var entity_type: int = 0
-@export var lifespan: float = 0.0
+@export_range(100, 300) var lifespan: int = randi_range(100, 300)
 @export var is_pc: bool = false
+@export_category("Stats")
+@export var age: int = 0
 
 @onready var sprite: Sprite2D = $Sprite2D
+
+var world: World
 
 var tile_address: Vector2i
 var animation_timer := 0.8
@@ -21,7 +25,7 @@ const ENTITY_NAMES := [
 	"Zulu",
 	"Delta",
 	"Romeo",
-	"Juliete",
+	"Juliette",
 	"Casper",
 ]
 
@@ -31,7 +35,9 @@ func _ready() -> void:
 	sprite.vframes = 4
 	sprite.frame = entity_type * 2
 
-	add_to_group("entities")
+	world = get_tree().current_scene if is_inside_tree() else null
+
+	world.age.connect(age_up)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -53,3 +59,29 @@ func face_direction(direction: Vector2i) -> void:
 		sprite.flip_h = true
 	elif direction == Vector2i.RIGHT:
 		sprite.flip_h = false
+
+
+func age_up() -> void:
+	self.age += 1
+	# print(
+	# 	"My name is ",
+	# 	self.name,
+	# 	" and I'm ",
+	# 	self.age,
+	# 	" ticks old!"
+	# )
+	if self.age >= self.lifespan:
+		expire()
+
+
+func expire() -> void:
+	if not self.is_pc:
+		# tell parent nest to remove me from the list... I'm tired
+		if get_parent() is Nest:
+			get_parent().entities.erase(self)
+		print("I am tired...")
+		print(self.name, " has gone to sleep. X_X")
+		queue_free()
+	else:
+		self.age = 1
+		print(self.name, " drank a potion of life! O_O")

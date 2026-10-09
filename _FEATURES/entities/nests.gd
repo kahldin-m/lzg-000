@@ -1,11 +1,11 @@
+class_name Nest
 extends Entity
 
-# Nest types: 0 = trex, 1 = velo
 @export var nest_size: int = 1
+@export var spawn_interval: int = 6	
 
 var entities: Array[Entity] = []
-var world: World 
-
+var internal_timer: int = 0
 
 func _ready() -> void:
 	world = get_tree().current_scene if is_inside_tree() else null
@@ -19,20 +19,30 @@ func _process(_delta: float) -> void:
 	pass
 
 
-func spawn_check(tick_time: float) -> void:
+func spawn_check(_tick_time: float) -> void:
 # Check if we need to spawn entities for this nest
-	if entities.size() < nest_size:
-		print("Not enough entities from nest - hatching more!")
-		entities.append(spawn_entity())
-	else:
-		print("Nest at max capacity! Waiting to cull.")
-		var despawner = Timer.new()
-		add_child(despawner)
-		despawner.wait_time = tick_time * 3
-		var target: Entity = entities.pop_front()
-		despawner.timeout.connect(\
-			func() -> void: despawn_entity(target, despawner))
-		despawner.start()
+	# if the nest is full, just return for now
+	if entities.size() >= nest_size:
+		return
+
+	internal_timer += 1
+	print(internal_timer)
+	
+	if internal_timer < spawn_interval:
+		return
+
+	print("Not enough entities from nest - hatching more!")
+	entities.append(spawn_entity())
+	internal_timer = 0
+	
+	# print("Nest at max capacity! Waiting to cull.")
+	# var despawner = Timer.new()
+	# add_child(despawner)
+	# despawner.wait_time = spawn_interval
+	# var target: Entity = entities.pop_front()
+	# despawner.timeout.connect(\
+	# 	func() -> void: despawn_entity(target, despawner))
+	# despawner.start()
 
 func spawn_entity() -> Entity:
 	var entity: Entity = World.ENTITY_SCENE.instantiate()
@@ -52,7 +62,7 @@ func spawn_entity() -> Entity:
 		entity.entity_type,
 		" at: ",
 		offset)
-	
+
 	return entity
 
 func despawn_entity(entity: Entity, timer: Timer) -> void:

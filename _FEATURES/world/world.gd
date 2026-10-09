@@ -24,6 +24,7 @@ const ENTITY_SCENE: PackedScene = preload("res://_FEATURES/entities/entities.tsc
 const ENTITY_SPEED := 50
 
 signal hatch(tick_time: float)
+signal age()
 
 
 # ready, process and game_tick
@@ -50,6 +51,7 @@ func _process(_delta: float) -> void:
 
 func game_tick():
 	hatch.emit(tick_time)
+	age.emit()
 
 	if direction == Vector2i.ZERO:
 		return
@@ -67,7 +69,7 @@ func game_tick():
 
 	# Check the tile we're on now for food
 	var decor_layer: TileMapLayer = collision_layers[2]
-	
+
 	var player_address := decor_layer.local_to_map(
 		decor_layer.to_local(player.global_position)
 	)
@@ -76,7 +78,7 @@ func game_tick():
 
 	if tile_data and tile_data.get_custom_data("has_food"):
 		decor_layer.erase_cell(player_address)
-		print("****OM NOM NOM!!!****")
+		# print here om nom nom
 	# Check for collisions before moving
 
 	# player_address += direction
@@ -144,7 +146,7 @@ func is_tile_walkable(address: Vector2i) -> bool:
 
 		if not tile_data.has_custom_data("is_walkable"):
 			continue
-			
+
 		if not tile_data.get_custom_data("is_walkable"):
 			return false
 

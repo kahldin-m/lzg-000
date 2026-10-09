@@ -15,3 +15,8 @@ vframes = 4
 frame = 7
 region_enabled = true
 region_rect = Rect2(0, 0, 32, 64)
+
+[node name="Dialog" type="RichTextLabel" parent="." unique_id=1538663885]
+offset_left = -11.0
+offset_top = -14.0
+offset_right = 29.0
