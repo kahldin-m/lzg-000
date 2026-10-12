@@ -12,12 +12,16 @@ metadata/_custom_type_script = "uid://hby65jfmswfd"
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=806037853]
 texture = ExtResource("2_qfm1q")
 offset = Vector2(8, 8)
-hframes = 2
+hframes = 4
 vframes = 4
 region_enabled = true
-region_rect = Rect2(0, 0, 32, 64)
+region_rect = Rect2(0, 0, 64, 64)
 
 [node name="Dialog" type="RichTextLabel" parent="." unique_id=1538663885]
 offset_left = -11.0
 offset_top = -14.0
 offset_right = 29.0
+theme_override_font_sizes/normal_font_size = 4
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 2

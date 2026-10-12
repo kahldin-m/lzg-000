@@ -44,9 +44,9 @@ const DINO_TYPE := [
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	sprite.hframes = 2
+	sprite.hframes = 4
 	sprite.vframes = 4
-	sprite.frame = entity_type * 2
+	sprite.frame_coords.x = 0
 
 	world = get_tree().current_scene as World
 
@@ -64,12 +64,23 @@ func _process(delta: float) -> void:
 
 	if animation_timer >= ANIMATION_SPEED:
 		animation_timer = 0.0
+		var address := world.position_to_tile_address(self.global_position)
 
-		# Toggle between the two frames belonging to this creature type
-		if sprite.frame == entity_type * 2:
-			sprite.frame = entity_type * 2 + 1
+		# Toggle between the two frames belonging to this creature type and check if swimming
+		var is_land := world.is_land_tile(address)
+		var is_swimming: bool = not is_land and world.is_water_tile(address)
+
+		var start_frame := 2 if is_swimming else 0
+
+		sprite.frame_coords.y = entity_type
+
+		if sprite.frame_coords.x == start_frame:
+			sprite.frame_coords.x = start_frame + 1
 		else:
-			sprite.frame = entity_type * 2
+			sprite.frame_coords.x = start_frame
+
+
+
 
 	# Movement control
 	if not is_pc:
@@ -108,7 +119,7 @@ func action_move() -> void:
 		self.position = world.tile_address_to_position(target_tile)
 
 	# Check the tile we're on now for food
-	var decor_layer: TileMapLayer = world.collision_layers[2]
+	var decor_layer: TileMapLayer = world.tile_layers[3]
 
 	var player_address := decor_layer.local_to_map(
 		decor_layer.to_local(self.global_position)

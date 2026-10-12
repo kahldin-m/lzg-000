@@ -12,10 +12,12 @@ extends Node2D
 var player: Entity
 var game_camera: Camera2D
 
-@onready var collision_layers: Array[TileMapLayer] = [
+@onready var tile_layers: Array[TileMapLayer] = [
+	$TileLayers/Water_BG,
 	$TileLayers/Water,
 	$TileLayers/Plateaus,
-	$TileLayers/Decor
+	$TileLayers/Decor,
+	$TileLayers/Ground,
 ]
 
 const TILE_SIZE := 16
@@ -97,7 +99,7 @@ func position_to_tile_address(pos: Vector2) -> Vector2i:
 
 func is_tile_walkable(address: Vector2i) -> bool:
 	# Check the logged layers for no_walk Custom Data
-	for layer in collision_layers:
+	for layer in tile_layers:
 		var tile_data: TileData = layer.get_cell_tile_data(address)
 
 		if tile_data == null:
@@ -112,6 +114,47 @@ func is_tile_walkable(address: Vector2i) -> bool:
 		continue
 
 	return true
+
+
+func is_land_tile(address: Vector2i) -> bool:
+	# Check the logged layers for is_land Custom Data
+	for layer in tile_layers:
+		var tile_data: TileData = layer.get_cell_tile_data(address)
+
+		if tile_data == null:
+			continue
+
+		if tile_data.has_custom_data("is_land"):
+			var is_land = tile_data.get_custom_data("is_land")
+
+			if is_land:
+				return true
+
+		continue
+
+	return false
+
+
+
+func is_water_tile(address: Vector2i) -> bool:
+	# Check the logged layers for is_water Custom Data
+	for layer in tile_layers:
+		var tile_data: TileData = layer.get_cell_tile_data(address)
+
+		if tile_data == null:
+			continue
+
+		if tile_data.has_custom_data("is_water"):
+			var is_water = tile_data.get_custom_data("is_water")
+
+			if is_water:
+				return true
+
+		continue
+
+	return false
+
+
 
 
 # Dice
