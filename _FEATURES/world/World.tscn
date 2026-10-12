@@ -765,8 +765,9 @@ texture = ExtResource("3_axssw")
 11:4/0 = 0
 11:4/0/custom_data_0 = true
 11:2/0 = 0
-11:2/0/y_sort_origin = 7
+11:2/0/y_sort_origin = -7
 11:3/0 = 0
+11:3/0/y_sort_origin = -7
 4:2/0 = 0
 4:2/0/custom_data_1 = true
 4:2/0/custom_data_2 = 5
@@ -791,7 +792,7 @@ sources/0 = SubResource("TileSetAtlasSource_axssw")
 [node name="World" type="Node2D" unique_id=681732503]
 y_sort_enabled = true
 script = ExtResource("1_7x3tx")
-tick_time = 1.0
+tick_time = 0.5
 starting_tile = Vector2i(27, 26)
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1361892099]
@@ -799,25 +800,26 @@ starting_tile = Vector2i(27, 26)
 [node name="Nests" type="Node2D" parent="." unique_id=710626792]
 y_sort_enabled = true
 
-[node name="Nest_Ramp" parent="Nests" unique_id=165726692 instance=ExtResource("4_a5qos")]
-y_sort_enabled = true
-position = Vector2(176, 336)
-nest_size = 0
-entity_type = 3
+[node name="Nest_Trex" parent="Nests" unique_id=823120470 instance=ExtResource("4_a5qos")]
+position = Vector2(720, 112)
+age = 0
 
 [node name="Nest_Velo" parent="Nests" unique_id=757852569 instance=ExtResource("4_a5qos")]
 position = Vector2(848, 464)
-nest_size = 0
 entity_type = 1
+age = 0
 
 [node name="Nest_Compy" parent="Nests" unique_id=97628967 instance=ExtResource("4_a5qos")]
 position = Vector2(176, 80)
 nest_size = 6
 entity_type = 2
+age = 0
 
-[node name="Nest_Trex" parent="Nests" unique_id=823120470 instance=ExtResource("4_a5qos")]
-position = Vector2(720, 112)
-nest_size = 0
+[node name="Nest_Ramp" parent="Nests" unique_id=165726692 instance=ExtResource("4_a5qos")]
+y_sort_enabled = true
+position = Vector2(176, 336)
+entity_type = 3
+age = 0
 
 [node name="TileLayers" type="Node2D" parent="." unique_id=983266102]
 physics_interpolation_mode = 1

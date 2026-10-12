@@ -2,7 +2,7 @@ class_name Entity
 extends Node2D
 
 @export_range(0, 3) var entity_type: int = 0
-@export_range(10, 30) var lifespan: int = randi_range(10, 30)
+@export_range(0, 300) var lifespan: int = 0
 @export var is_pc: bool = false
 @export_category("Stats")
 @export var age: int = 0
@@ -35,6 +35,12 @@ const ENTITY_NAMES := [
 	"Juliette",
 	"Casper",
 ]
+const DINO_TYPE := [
+	"Tyrannosaurus",
+	"Velociraptor",
+	"Compsognathus ",
+	"Rhamphorhynchus"
+]
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -45,8 +51,10 @@ func _ready() -> void:
 	world = get_tree().current_scene as World
 
 	if world != null:
-		world.age.connect(age_up)
+		world.age.connect(action_age)
 		if not self.is_pc:
+			world.wander.connect(action_wander)
+		else:
 			world.wander.connect(action_move)
 
 
@@ -63,7 +71,7 @@ func _process(delta: float) -> void:
 		else:
 			sprite.frame = entity_type * 2
 
-	# Movement logic
+	# Movement control
 	if not is_pc:
 		return
 
@@ -75,8 +83,6 @@ func _process(delta: float) -> void:
 		direction = dir_array[2]
 	elif Input.is_action_pressed("move_right"):
 		direction = dir_array[3]
-
-	action_move()
 
 
 func face_direction(dir: Vector2i) -> void:
@@ -113,10 +119,7 @@ func action_move() -> void:
 	if tile_data and tile_data.get_custom_data("has_food"):
 		decor_layer.erase_cell(player_address)
 		# print here om nom nom
-	# Check for collisions before moving
 
-	# player_address += direction
-	# player.position = tile_address_to_position(player_address)
 	# Reset direction
 	direction = Vector2i.ZERO
 
@@ -124,18 +127,31 @@ func action_move() -> void:
 	print(name, " at : ", player_address)
 
 
-func age_up() -> void:
-	self.age += 1
-	if self.age >= self.lifespan:
-		expire()
+func action_wander() -> void:
+	# roll the dice, move your mice
+	var my_dir := randi_range(0, dir_array.size() - 1)
+
+	# roughly 1 in 3 chance to move
+	if world.d3() == 1:
+		var new_dir := dir_array[my_dir]
+		var new_pos := world.position_to_tile_address(self.global_position) + new_dir
+		if world.is_tile_walkable(new_pos):
+			self.global_position = world.tile_address_to_position(new_pos)
+			face_direction(new_dir)
 
 
-func expire() -> void:
+func action_age() -> void:
+	if self.age != 0:
+		self.age += 1
+		if self.age >= self.lifespan:
+			action_expire()
+
+
+func action_expire() -> void:
 	if not self.is_pc:
 		# tell parent nest to remove me from the list... I'm tired
-		if get_parent() is Nest:
-			get_parent().entities.erase(self)
-		# print("I am tired...")
+		get_parent().entities.erase(self)
+		# print("I'm tired boss...")
 		# print(self.name, " has gone to sleep. X_X")
 		queue_free()
 	else:

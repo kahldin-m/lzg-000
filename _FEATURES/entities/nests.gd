@@ -49,8 +49,8 @@ func spawn_check(_tick_time: float) -> void:
 func spawn_entity() -> Entity:
 	# Generate tile to spawn entity
 	var offset := Vector2i(\
-		randi_range(0, 0),\
-		randi_range(-4, -5))
+		randi_range(-5, +5),\
+		randi_range(-5, +5))
 
 	if offset == Vector2i.ZERO:
 		offset = Vector2i.ONE
@@ -68,9 +68,9 @@ func spawn_entity() -> Entity:
 	entity.position = world.tile_address_to_position(spawn_tile)
 	entity.entity_type = entity_type
 	var name_part1: String = ENTITY_NAMES[randi_range(0, ENTITY_NAMES.size() - 1)]
-	var name_part2: String = str(entity.entity_type)
-	entity.name = name_part1 + " the " + name_part2
-
+	entity.name = name_part1 + " the " + DINO_TYPE[entity.entity_type]
+	print(entity.name, " is born!")
+	entity.lifespan = randi_range(100, 300)
 	return entity
 
 func despawn_entity(entity: Entity, timer: Timer) -> void:

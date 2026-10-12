@@ -112,3 +112,16 @@ func is_tile_walkable(address: Vector2i) -> bool:
 		continue
 
 	return true
+
+
+# Dice
+func d100() -> int:
+	return randi() % 100 + 1
+
+
+func d3() -> int:
+	return randi() % 3 + 1
+
+
+func d4() -> int:
+	return randi() % 4 + 1
