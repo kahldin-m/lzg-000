@@ -5,7 +5,6 @@
 
 [node name="Nest" type="Node2D" unique_id=165726692]
 script = ExtResource("1_nuybm")
-age = null
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=970408143]
 position = Vector2(8, 8)

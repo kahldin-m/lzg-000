@@ -3,13 +3,19 @@ extends Node2D
 
 @export_category("DEBUG")
 @export var DEBUG_MODE: bool = false
+
 @export_category("Game Settings")
 @export var tick_time: float = 0.3
 @export var world_size: Vector2i = Vector2i(64, 32)
 @export var starting_tile: Vector2i = Vector2i(0, 0)
-# var bg_tile_texture: Texture2D = preload("res://_FEATURES/the_world/grass_01.png")
+
+@export_category("Simulation Settings")
+@export var max_pop: int = 24
+var current_pop: int
 
 var player: Entity
+var world_pop: Array[Entity] = []
+var ent_node: Node2D
 var game_camera: Camera2D
 
 @onready var tile_layers: Array[TileMapLayer] = [
@@ -25,6 +31,7 @@ const ENTITY_SCENE: PackedScene = preload("res://_FEATURES/entities/entities.tsc
 const ENTITY_SPEED := 50
 
 signal hatch(tick_time: float)
+signal mate_found(entity: Entity)
 signal wander()
 signal age()
 
@@ -35,7 +42,6 @@ func _ready() -> void:
 	setup_camera()
 	setup_timer()
 
-
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("camera_zoomin"):
 		game_camera.zoom += Vector2(0.25, 0.25)
@@ -44,10 +50,9 @@ func _process(_delta: float) -> void:
 
 
 func game_tick():
-	hatch.emit(tick_time)
 	wander.emit()
 	age.emit()
-
+	hatch.emit(tick_time)
 
 
 # SETUPS
@@ -75,15 +80,7 @@ func setup_player() -> void:
 	player.is_pc = true
 	player.entity_type = 0
 	player.name = "Player"
-
 	player.position = tile_address_to_position(starting_tile)
-
-	var player_collision = CollisionShape2D.new()
-	var collision_shape = RectangleShape2D.new()
-	collision_shape.size = Vector2(16, 13)
-	player_collision.shape = collision_shape
-
-	player.add_child(player_collision)
 
 	add_child(player)
 
@@ -155,6 +152,18 @@ func is_water_tile(address: Vector2i) -> bool:
 	return false
 
 
+func register_entity(entity: Entity) -> void:
+	if world_pop.has(entity):
+		return
+
+	world_pop.append(entity)
+	entity.mate_found.connect(_on_entity_mate_found.bind(entity))
+
+
+func _on_entity_mate_found(entity: Entity) -> void:
+	# Forward the event to the nest system
+	print(entity.name, " found a potential mate.")
+	mate_found.emit(entity)
 
 
 # Dice

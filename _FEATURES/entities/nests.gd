@@ -1,11 +1,12 @@
 class_name Nest
 extends Entity
 
-@export var nest_size: int = 1
+@export var nest_min: int = 2
+@export var nest_max: int = 8
 @export var spawn_interval: int = 6
 
 var entities_node: Node2D
-var entities: Array[Entity] = []
+var nest_pop: Array[Entity] = []
 var internal_timer: int = 0
 
 func _ready() -> void:
@@ -16,6 +17,9 @@ func _ready() -> void:
 
 	world.hatch.connect(spawn_check)
 
+	world.mate_found.connect(_on_mate_found)
+
+
 func _process(_delta: float) -> void:
 	pass
 
@@ -23,7 +27,7 @@ func _process(_delta: float) -> void:
 func spawn_check(_tick_time: float) -> void:
 # Check if we need to spawn entities for this nest
 	# if the nest is full, just return for now
-	if entities.size() >= nest_size:
+	if nest_pop.size() >= nest_min:
 		return
 
 	internal_timer += 1
@@ -34,7 +38,8 @@ func spawn_check(_tick_time: float) -> void:
 
 	if entity != null:
 		# print("Not enough entities from nest - hatching more!")
-		entities.append(entity)
+		world.register_entity(entity)
+		nest_pop.append(entity)
 		internal_timer = 0
 
 	# print("Nest at max capacity! Waiting to cull.")
@@ -64,16 +69,39 @@ func spawn_entity() -> Entity:
 	if not world.is_tile_walkable(spawn_tile):
 		entity.queue_free()
 		return null
+
+	# Entity setup
+	var name_part1: String = ENTITY_NAMES[randi_range(0, ENTITY_NAMES.size() - 1)]
+	entity.home_nest = self
 	entities_node.add_child(entity)
 	entity.position = world.tile_address_to_position(spawn_tile)
-	entity.entity_type = entity_type
-	var name_part1: String = ENTITY_NAMES[randi_range(0, ENTITY_NAMES.size() - 1)]
+	entity.entity_type = entity_type	
 	entity.name = name_part1 + " the " + DINO_TYPE[entity.entity_type]
-	print(entity.name, " is born!")
 	entity.lifespan = randi_range(100, 300)
+	entity.age = 1
+	print(">> ", entity.name, " is born! <<")
+	
 	return entity
 
-func despawn_entity(entity: Entity, timer: Timer) -> void:
-	print(entity.name + " has just died! :(")
-	entity.queue_free()
-	timer.call_deferred("queue_free")
+# func despawn_entity(entity: Entity, timer: Timer) -> void:
+# 	print(entity.name + " has just died! :(")
+# 	entity.queue_free()
+# 	timer.call_deferred("queue_free")
+
+
+func _on_mate_found(entity: Entity) -> void:
+	if entity.entity_type != entity_type:
+		return
+
+	if nest_pop.size() >= nest_max:
+		return
+
+	var baby := spawn_entity()
+	print("Spawn result: ", baby)
+
+	if baby != null:
+		nest_pop.append(baby)
+		world.register_entity(baby)
+		# print("Baby registered. Nest population: ", nest_pop.size())
+	else:
+		print("Spawn failed.")

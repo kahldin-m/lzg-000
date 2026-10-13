@@ -1,26 +1,38 @@
 class_name Entity
 extends Node2D
 
+@export_category("Settings")
 @export_range(0, 3) var entity_type: int = 0
 @export_range(0, 300) var lifespan: int = 0
+@export var mate_cooldown: int = 30
 @export var is_pc: bool = false
 @export_category("Stats")
 @export var age: int = 0
+@export var hunger: int = 100
 
 @onready var sprite: Sprite2D = $Sprite2D
 
 var world: World
+var home_nest: Nest
 var direction: Vector2i = Vector2i.ZERO
-var dir_array: Array[Vector2i] = [
-	Vector2i.UP,
-	Vector2i.DOWN,
-	Vector2i.LEFT,
-	Vector2i.RIGHT,
-]
+var just_moved: bool = false
+@onready var mate_timer: int = mate_cooldown
+
+signal mate_found()
 
 var tile_address: Vector2i
 var animation_timer := 0.8
 const ANIMATION_SPEED := 0.5
+const DIRECTIONS: Array[Vector2i] = [
+	Vector2i.UP,
+	Vector2i.DOWN,
+	Vector2i.LEFT,
+	Vector2i.RIGHT,
+	Vector2i.UP + Vector2i.LEFT,
+	Vector2i.UP + Vector2i.RIGHT,
+	Vector2i.DOWN + Vector2i.LEFT,
+	Vector2i.DOWN + Vector2i.RIGHT,
+]
 const ENTITY_NAMES := [
 	"Frank",
 	"Zelda",
@@ -58,6 +70,7 @@ func _ready() -> void:
 			world.wander.connect(action_move)
 
 
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	animation_timer += delta
@@ -80,20 +93,18 @@ func _process(delta: float) -> void:
 			sprite.frame_coords.x = start_frame
 
 
-
-
 	# Movement control
 	if not is_pc:
 		return
 
 	if Input.is_action_pressed("move_up"):
-		direction = dir_array[0]
+		direction = DIRECTIONS[0]
 	elif Input.is_action_pressed("move_down"):
-		direction = dir_array[1]
+		direction = DIRECTIONS[1]
 	elif Input.is_action_pressed("move_left"):
-		direction = dir_array[2]
+		direction = DIRECTIONS[2]
 	elif Input.is_action_pressed("move_right"):
-		direction = dir_array[3]
+		direction = DIRECTIONS[3]
 
 
 func face_direction(dir: Vector2i) -> void:
@@ -139,32 +150,74 @@ func action_move() -> void:
 
 
 func action_wander() -> void:
+	if mate_timer > 0:
+		mate_timer -= 1
 	# roll the dice, move your mice
-	var my_dir := randi_range(0, dir_array.size() - 1)
+	var my_dir := randi_range(0, DIRECTIONS.size() - 1)
 
 	# roughly 1 in 3 chance to move
 	if world.d3() == 1:
-		var new_dir := dir_array[my_dir]
+		var new_dir := DIRECTIONS[my_dir]
 		var new_pos := world.position_to_tile_address(self.global_position) + new_dir
 		if world.is_tile_walkable(new_pos):
 			self.global_position = world.tile_address_to_position(new_pos)
 			face_direction(new_dir)
 
+	action_mate()
 
 func action_age() -> void:
-	if self.age != 0:
-		self.age += 1
-		if self.age >= self.lifespan:
-			action_expire()
+	if self.age == 0:
+		return
+
+	self.age += 1
+	if self.age > self.lifespan:
+		expire()
 
 
-func action_expire() -> void:
+func action_mate() -> void:
+	if mate_timer > 0:
+		return
+
+	var my_tile := world.position_to_tile_address(self.global_position)
+
+	for dino in world.world_pop:
+		if dino == self:
+			continue
+		if dino.entity_type != self.entity_type:
+			continue
+
+		var mate_tile := world.position_to_tile_address(dino.global_position)
+		if mate_tile in get_surrounding_tiles(my_tile):
+			print(self.name, " says: 'Hey, there's a mate nearby! :D'")
+			# Mating now on cooldown
+			mate_timer = mate_cooldown
+			mate_found.emit()
+			return
+
+
+func expire() -> void:
 	if not self.is_pc:
 		# tell parent nest to remove me from the list... I'm tired
-		get_parent().entities.erase(self)
-		# print("I'm tired boss...")
-		# print(self.name, " has gone to sleep. X_X")
+		world.world_pop.erase(self)
+
+		if is_instance_valid(home_nest):
+			home_nest.nest_pop.erase(self)
+
+		print(self.name, " has gone to sleep. x__x")
 		queue_free()
 	else:
 		self.age = 1
 		# print(self.name, " drank a potion of life! O_O")
+
+
+func get_surrounding_tiles(current_tile: Vector2i) -> Array[Vector2i]:
+	var surrounding_tiles: Array[Vector2i] = []
+
+	for x in range(-1, 2):
+		for y in range(-1, 2):
+			if x == 0 and y == 0:
+				continue
+
+			surrounding_tiles.append(current_tile + Vector2i(x, y))
+
+	return surrounding_tiles
