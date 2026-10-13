@@ -33,6 +33,7 @@ const ENTITY_SPEED := 50
 signal hatch(tick_time: float)
 signal mate_found(entity: Entity)
 signal wander()
+signal mate_tick()
 signal age()
 
 
@@ -51,6 +52,7 @@ func _process(_delta: float) -> void:
 
 func game_tick():
 	wander.emit()
+	mate_tick.emit()
 	age.emit()
 	hatch.emit(tick_time)
 
@@ -83,6 +85,7 @@ func setup_player() -> void:
 	player.position = tile_address_to_position(starting_tile)
 
 	add_child(player)
+	register_entity(player)
 
 
 # HELPERS
@@ -147,6 +150,25 @@ func is_water_tile(address: Vector2i) -> bool:
 			if is_water:
 				return true
 
+		continue
+
+	return false
+
+
+func is_food_tile(address: Vector2i) -> bool:
+	for layer in tile_layers:
+		var tile_data: TileData = layer.get_cell_tile_data(address)
+
+		if tile_data == null:
+			continue
+
+		# does the tile have "is_food" data?
+		if tile_data.has_custom_data("is_food"):
+			var is_food = tile_data.get_custom_data("is_food")
+
+			if is_food:
+				return true
+		# if not, continue to next layer
 		continue
 
 	return false

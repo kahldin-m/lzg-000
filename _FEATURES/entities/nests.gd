@@ -75,12 +75,12 @@ func spawn_entity() -> Entity:
 	entity.home_nest = self
 	entities_node.add_child(entity)
 	entity.position = world.tile_address_to_position(spawn_tile)
-	entity.entity_type = entity_type	
+	entity.entity_type = entity_type
 	entity.name = name_part1 + " the " + DINO_TYPE[entity.entity_type]
 	entity.lifespan = randi_range(100, 300)
 	entity.age = 1
-	print(">> ", entity.name, " is born! <<")
-	
+	print(">> ", entity.name, " hatched! <<")
+
 	return entity
 
 # func despawn_entity(entity: Entity, timer: Timer) -> void:
@@ -94,14 +94,15 @@ func _on_mate_found(entity: Entity) -> void:
 		return
 
 	if nest_pop.size() >= nest_max:
+		print("Too many ", entity_type)
 		return
 
 	var baby := spawn_entity()
-	print("Spawn result: ", baby)
 
 	if baby != null:
 		nest_pop.append(baby)
 		world.register_entity(baby)
+		print(baby.name, " was born!")
 		# print("Baby registered. Nest population: ", nest_pop.size())
 	else:
 		print("Spawn failed.")

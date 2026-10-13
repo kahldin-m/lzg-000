@@ -4,7 +4,7 @@ extends Node2D
 @export_category("Settings")
 @export_range(0, 3) var entity_type: int = 0
 @export_range(0, 300) var lifespan: int = 0
-@export var mate_cooldown: int = 30
+@export var mate_cooldown: int = 50 # n * tick_time
 @export var is_pc: bool = false
 @export_category("Stats")
 @export var age: int = 0
@@ -13,8 +13,11 @@ extends Node2D
 @onready var sprite: Sprite2D = $Sprite2D
 
 var world: World
+var timer: Timer
+var emote: RichTextLabel
 var home_nest: Nest
 var direction: Vector2i = Vector2i.ZERO
+var current_tile: Vector2i
 var just_moved: bool = false
 @onready var mate_timer: int = mate_cooldown
 
@@ -33,6 +36,7 @@ const DIRECTIONS: Array[Vector2i] = [
 	Vector2i.DOWN + Vector2i.LEFT,
 	Vector2i.DOWN + Vector2i.RIGHT,
 ]
+# make this a dict, with name keys and gender values at some point
 const ENTITY_NAMES := [
 	"Frank",
 	"Zelda",
@@ -60,10 +64,16 @@ func _ready() -> void:
 	sprite.vframes = 4
 	sprite.frame_coords.x = 0
 
+	emote = $Emote
+	timer = $EmoteTimer
+
 	world = get_tree().current_scene as World
 
 	if world != null:
+		world.mate_tick.connect(action_mate_tick)
+		current_tile = world.position_to_tile_address(self.global_position)
 		world.age.connect(action_age)
+
 		if not self.is_pc:
 			world.wander.connect(action_wander)
 		else:
@@ -77,11 +87,10 @@ func _process(delta: float) -> void:
 
 	if animation_timer >= ANIMATION_SPEED:
 		animation_timer = 0.0
-		var address := world.position_to_tile_address(self.global_position)
 
 		# Toggle between the two frames belonging to this creature type and check if swimming
-		var is_land := world.is_land_tile(address)
-		var is_swimming: bool = not is_land and world.is_water_tile(address)
+		var is_land := world.is_land_tile(current_tile)
+		var is_swimming: bool = not is_land and world.is_water_tile(current_tile)
 
 		var start_frame := 2 if is_swimming else 0
 
@@ -121,49 +130,39 @@ func action_move() -> void:
 	# Flip sprite based on direction
 	self.face_direction(direction)
 
-		#  Calculate target tile
-	var current_tile := world.position_to_tile_address(self.position)
+	#  Calculate target tile
 	var target_tile := current_tile + direction
 
 	# Move if target tile is walkable
 	if world.is_tile_walkable(target_tile):
 		self.position = world.tile_address_to_position(target_tile)
 
-	# Check the tile we're on now for food
-	var decor_layer: TileMapLayer = world.tile_layers[3]
+	# Check the target tile for food
+	if world.is_food_tile(target_tile):
+		world.tile_layers[3].erase_cell(target_tile)
+		show_emote("🌿[color=green]+[/color]")
 
-	var player_address := decor_layer.local_to_map(
-		decor_layer.to_local(self.global_position)
-	)
-	var tile_data := decor_layer.get_cell_tile_data(player_address)
-
-
-	if tile_data and tile_data.get_custom_data("has_food"):
-		decor_layer.erase_cell(player_address)
-		# print here om nom nom
-
-	# Reset direction
+	# Reset direction and update current_tile
 	direction = Vector2i.ZERO
-
+	current_tile = world.position_to_tile_address(self.global_position)
 	# Print actual player position
-	print(name, " at : ", player_address)
+	print(name, " at : ", current_tile)
+
 
 
 func action_wander() -> void:
-	if mate_timer > 0:
-		mate_timer -= 1
 	# roll the dice, move your mice
 	var my_dir := randi_range(0, DIRECTIONS.size() - 1)
 
 	# roughly 1 in 3 chance to move
 	if world.d3() == 1:
 		var new_dir := DIRECTIONS[my_dir]
-		var new_pos := world.position_to_tile_address(self.global_position) + new_dir
-		if world.is_tile_walkable(new_pos):
-			self.global_position = world.tile_address_to_position(new_pos)
+		var target_tile := world.position_to_tile_address(self.global_position) + new_dir
+		if world.is_tile_walkable(target_tile):
+			self.global_position = world.tile_address_to_position(target_tile)
+			current_tile = world.position_to_tile_address(self.global_position)
 			face_direction(new_dir)
 
-	action_mate()
 
 func action_age() -> void:
 	if self.age == 0:
@@ -178,8 +177,6 @@ func action_mate() -> void:
 	if mate_timer > 0:
 		return
 
-	var my_tile := world.position_to_tile_address(self.global_position)
-
 	for dino in world.world_pop:
 		if dino == self:
 			continue
@@ -187,13 +184,19 @@ func action_mate() -> void:
 			continue
 
 		var mate_tile := world.position_to_tile_address(dino.global_position)
-		if mate_tile in get_surrounding_tiles(my_tile):
+		if mate_tile in get_surrounding_tiles():
 			print(self.name, " says: 'Hey, there's a mate nearby! :D'")
 			# Mating now on cooldown
 			mate_timer = mate_cooldown
 			mate_found.emit()
+			show_emote("😍[color=pink]![/color]")
 			return
 
+
+func action_mate_tick() -> void:
+	if mate_timer > 0:
+		mate_timer -= 1
+	action_mate()
 
 func expire() -> void:
 	if not self.is_pc:
@@ -203,14 +206,14 @@ func expire() -> void:
 		if is_instance_valid(home_nest):
 			home_nest.nest_pop.erase(self)
 
-		print(self.name, " has gone to sleep. x__x")
+		print(self.name, " has gone to...sleep x__x")
 		queue_free()
 	else:
 		self.age = 1
 		# print(self.name, " drank a potion of life! O_O")
 
 
-func get_surrounding_tiles(current_tile: Vector2i) -> Array[Vector2i]:
+func get_surrounding_tiles() -> Array[Vector2i]:
 	var surrounding_tiles: Array[Vector2i] = []
 
 	for x in range(-1, 2):
@@ -218,6 +221,15 @@ func get_surrounding_tiles(current_tile: Vector2i) -> Array[Vector2i]:
 			if x == 0 and y == 0:
 				continue
 
-			surrounding_tiles.append(current_tile + Vector2i(x, y))
+			surrounding_tiles.append(self.current_tile + Vector2i(x, y))
 
 	return surrounding_tiles
+
+
+func show_emote(msg: String) -> void:
+	self.emote.text = msg
+	self.timer.start(4.0)
+
+
+func _on_emote_timer_timeout() -> void:
+	self.emote.text = ""
