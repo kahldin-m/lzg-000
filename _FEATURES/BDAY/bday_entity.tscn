@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://3vv7do6kfeoq"]
+
+[ext_resource type="Script" uid="uid://bf12xwmp0wx85" path="res://_FEATURES/BDAY/bday_entity.gd" id="1_wv0pe"]
+[ext_resource type="Texture2D" uid="uid://b86s8qtab0fj" path="res://_FEATURES/BDAY/dino_party.png" id="2_cy5dx"]
+[ext_resource type="FontFile" uid="uid://bgi5hbvrrlcgr" path="res://PixelOperator8-Bold.ttf" id="3_wlmmi"]
+
+[node name="BirthdayGuest" type="Node2D" unique_id=42132426]
+script = ExtResource("1_wv0pe")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1844719412]
+texture_filter = 1
+position = Vector2(8, -12)
+texture = ExtResource("2_cy5dx")
+hframes = 2
+vframes = 5
+region_enabled = true
+region_rect = Rect2(0, 0, 32, 120)
+
+[node name="Emote" type="RichTextLabel" parent="." unique_id=1744454790]
+texture_filter = 1
+clip_contents = false
+offset_left = 3.0
+offset_top = -42.0
+offset_right = 19.0
+offset_bottom = -26.0
+theme_override_colors/default_color = Color(0.6117991, 0.0037393742, 0.947254, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.78431374)
+theme_override_constants/shadow_offset_x = 2
+theme_override_fonts/normal_font = ExtResource("3_wlmmi")
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false

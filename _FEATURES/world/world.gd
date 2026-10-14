@@ -48,7 +48,8 @@ func _process(_delta: float) -> void:
 		game_camera.zoom += Vector2(0.25, 0.25)
 	if Input.is_action_just_pressed("camera_zoomout"):
 		game_camera.zoom -= Vector2(0.25, 0.25)
-
+	if game_camera.zoom < Vector2.ONE:
+		game_camera.zoom = Vector2.ONE
 
 func game_tick():
 	wander.emit()
@@ -73,6 +74,11 @@ func setup_camera() -> void:
 
 	game_camera.enabled = true
 	game_camera.zoom = Vector2(5, 5)
+	game_camera.limit_left = -270
+	game_camera.limit_top = -270
+	game_camera.limit_bottom = 1080
+	game_camera.limit_right = 1920
+
 
 
 # Setup Player

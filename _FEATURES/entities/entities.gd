@@ -54,7 +54,7 @@ const ENTITY_NAMES := [
 const DINO_TYPE := [
 	"Tyrannosaurus",
 	"Velociraptor",
-	"Compsognathus ",
+	"Compsognathus",
 	"Rhamphorhynchus"
 ]
 

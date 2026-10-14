@@ -41,6 +41,7 @@ func spawn_check(_tick_time: float) -> void:
 		world.register_entity(entity)
 		nest_pop.append(entity)
 		internal_timer = 0
+		print(">> ", entity.name, " hatched! <<")
 
 	# print("Nest at max capacity! Waiting to cull.")
 	# var despawner = Timer.new()
@@ -79,7 +80,6 @@ func spawn_entity() -> Entity:
 	entity.name = name_part1 + " the " + DINO_TYPE[entity.entity_type]
 	entity.lifespan = randi_range(100, 300)
 	entity.age = 1
-	print(">> ", entity.name, " hatched! <<")
 
 	return entity
 
@@ -94,7 +94,7 @@ func _on_mate_found(entity: Entity) -> void:
 		return
 
 	if nest_pop.size() >= nest_max:
-		print("Too many ", entity_type)
+		print("Too many ", DINO_TYPE[entity_type])
 		return
 
 	var baby := spawn_entity()

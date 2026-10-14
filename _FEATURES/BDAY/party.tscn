@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bhsqx7ejpsfms"]
+
+[ext_resource type="Script" uid="uid://18t3rntnrywd" path="res://_FEATURES/BDAY/party.gd" id="1_7h35c"]
+
+[node name="Party" type="Node2D" unique_id=1003721101]
+script = ExtResource("1_7h35c")
+march_duration = 6.0
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=488029318]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.58392996, 0.84735125, 0.93838406, 1)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1958201609]
+position = Vector2(960, 540)
+
+[node name="Guests" type="Node2D" parent="." unique_id=949562433]
+position = Vector2(24, 1032)
+scale = Vector2(3.5, 3.5)
+
+[node name="BirthdayMsg" type="Label" parent="." unique_id=1953480093]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Letter" type="PanelContainer" parent="." unique_id=573050307]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LetterText" type="RichTextLabel" parent="Letter" unique_id=1434297641]
+layout_mode = 2
+
+[node name="Confetti" type="GPUParticles2D" parent="." unique_id=628139053]
