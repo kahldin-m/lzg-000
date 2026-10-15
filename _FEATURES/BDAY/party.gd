@@ -32,9 +32,10 @@ func _ready() -> void:
 
 	letter = LETTER_SCENE.instantiate()
 	add_child(letter)
+
 	letter.hide()
 	letter.scale = Vector2(2.5, 2.5)
-	letter.position = Vector2(1920.0 / 2, 1080.0 / 2)
+	letter.position = Vector2(1920.0 / 2, -100)
 
 	popup_layer = POPUP_SCENE.instantiate()
 	add_child(popup_layer)
@@ -91,7 +92,7 @@ func _ready() -> void:
 
 			if line_index == 1 and msg_ary[i] == "!":
 				tween.tween_interval(5.0)
-				march_speed = 0.015
+				march_speed = 0.010
 
 			for step in range(step_count):
 				var target_x: float = minf(
@@ -113,7 +114,7 @@ func _ready() -> void:
 				arrived_guests += 1
 
 				if arrived_guests >= total_guests:
-					letter.show()
+					_drop_envelope()
 			)
 
 
@@ -124,3 +125,70 @@ func _on_letter_opened() -> void:
 func _close_letter_popup() -> void:
 	letter_popup.hide()
 	letter.reset_letter()
+
+
+func _drop_envelope() -> void:
+	letter.show()
+
+	var landing_y: float = (1080.0 / 2) + 100
+	var tween := create_tween()
+
+	# Fall and hit the "ground"
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y,
+		0.9
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y - 100.0,
+		0.55
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y,
+		0.65
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	# Second bounce
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y - 70.0,
+		0.4
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y,
+		0.45
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	# third
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y - 30.0,
+		0.25
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(
+		letter,
+		"position:y",
+		landing_y,
+		0.3
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+
+	# allow clicking once it's settled
+	tween.tween_callback(func():
+		letter.monitoring = true
+		letter.can_click = true
+		letter.label.show()
+	)

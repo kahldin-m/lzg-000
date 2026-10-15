@@ -1,7 +1,5 @@
 [gd_scene format=3 uid="uid://b3f6jiwalmne3"]
 
-[ext_resource type="FontFile" uid="uid://bfn0pr3v162kn" path="res://ALEF-REGULAR.TTF" id="1_go5up"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ax8ih"]
 bg_color = Color(0.9607843, 0.627451, 0.5921569, 1)
 border_width_left = 8
@@ -19,33 +17,38 @@ corner_radius_bottom_left = 16
 
 [node name="LetterPopup" type="PopupPanel" parent="." unique_id=916295170]
 oversampling_override = 1.0
-size = Vector2i(600, 700)
+size = Vector2i(600, 800)
 visible = true
 
 [node name="PanelContainer" type="PanelContainer" parent="LetterPopup" unique_id=1952797212]
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 596.0
-offset_bottom = 696.0
+offset_bottom = 796.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_ax8ih")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="LetterPopup/PanelContainer" unique_id=11750464]
 layout_mode = 2
 
-[node name="BirthdayMessage" type="RichTextLabel" parent="LetterPopup/PanelContainer/VBoxContainer" unique_id=2030288334]
-modulate = Color(0, 0, 0, 1)
-layout_mode = 2
-theme_override_fonts/normal_font = ExtResource("1_go5up")
-text = "Dear Céline,
-
-	Good morning and Happy Birthday!! 26 is to"
-
 [node name="CloseButton" type="Button" parent="LetterPopup/PanelContainer/VBoxContainer" unique_id=1373070145]
 custom_maximum_size = Vector2(55, -1)
 layout_mode = 2
 offset_transform_enabled = true
-offset_transform_position_ratio = Vector2(9.3, 0)
+offset_transform_position_ratio = Vector2(9.3, 0.2)
 offset_transform_scale = Vector2(1.2, 1.2)
 offset_transform_visual_only = false
 text = "X"
 icon_alignment = 2
+
+[node name="BirthdayMessage" type="RichTextLabel" parent="LetterPopup/PanelContainer/VBoxContainer" unique_id=2030288334]
+modulate = Color(0, 0, 0, 1)
+layout_mode = 2
+size_flags_vertical = 3
+offset_transform_enabled = true
+theme_override_colors/default_color = Color(0.3372549, 0.20784314, 0.23921569, 1)
+theme_override_font_sizes/normal_font_size = 22
+text = "Dear Céline,
+
+	Good morning and Happy 26th!!
+	"
+shortcut_keys_enabled = false

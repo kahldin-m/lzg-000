@@ -3,8 +3,10 @@ extends Area2D
 signal opened
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var label: Label = $Label
 
 var is_opening: bool = false
+var can_click: bool = false
 
 
 func _ready() -> void:
@@ -18,6 +20,8 @@ func _input_event(
 	event: InputEvent,
 	_shape_idx: int
 ) -> void:
+	if not can_click:
+		return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			if is_opening:
@@ -25,6 +29,7 @@ func _input_event(
 
 			is_opening = true
 			sprite.play("open")
+			label.hide()
 
 
 
