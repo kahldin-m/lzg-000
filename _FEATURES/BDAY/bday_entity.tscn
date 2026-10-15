@@ -23,7 +23,6 @@ offset_left = 3.0
 offset_top = -42.0
 offset_right = 19.0
 offset_bottom = -26.0
-theme_override_colors/default_color = Color(0.6117991, 0.0037393742, 0.947254, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.78431374)
 theme_override_constants/shadow_offset_x = 2

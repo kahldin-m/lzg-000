@@ -2,7 +2,8 @@
 extends Node2D
 
 const GUEST_SCENE: PackedScene = preload("res://_FEATURES/BDAY/bday_entity.tscn")
-
+const LETTER_SCENE: PackedScene = preload("res://_FEATURES/BDAY/birthday_letter.tscn")
+const POPUP_SCENE: PackedScene = preload("res://_FEATURES/BDAY/bday_message.tscn")
 const MESSAGES: Array[String] = [
 	"Happy Birthday",
 	"Céline!"
@@ -15,8 +16,43 @@ const FASTEST_MARCH_SPEED: float = 0.04
 const LETTER_SPACING: float = 120.0 # 24 * 5
 const LINE_SPACING: float = 240.0 # 48 * 5
 
+var letter: Area2D
+var total_guests: int = 0
+var arrived_guests: int = 0
+
+var letter_popup: PopupPanel
+var close_button: Button
+var popup_layer: CanvasLayer
+
 
 func _ready() -> void:
+	$ColorRect.color = Color.INDIGO
+	$Line1.color = Color.GOLD
+	$Line2.color = Color.GOLD
+
+	letter = LETTER_SCENE.instantiate()
+	add_child(letter)
+	letter.hide()
+	letter.scale = Vector2(2.5, 2.5)
+	letter.position = Vector2(1920.0 / 2, 1080.0 / 2)
+
+	popup_layer = POPUP_SCENE.instantiate()
+	add_child(popup_layer)
+
+	letter_popup = popup_layer.get_node("LetterPopup")
+	close_button = popup_layer.get_node(
+		"LetterPopup/PanelContainer/VBoxContainer/CloseButton"
+	)
+
+	letter.opened.connect(_on_letter_opened)
+
+	letter_popup.hide()
+	close_button.pressed.connect(_close_letter_popup)
+	letter_popup.close_requested.connect(_close_letter_popup)
+
+	for message in MESSAGES:
+		total_guests += message.length()
+
 	for line_index in range(MESSAGES.size()):
 		var msg_ary: PackedStringArray = MESSAGES[line_index].split("", true)
 		var line_width: float = (msg_ary.size() - 1) * LETTER_SPACING
@@ -25,6 +61,10 @@ func _ready() -> void:
 
 		for i in range(msg_ary.size()):
 			var carrier = GUEST_SCENE.instantiate()
+			carrier.get_node("Emote").add_theme_color_override(
+				"default_color",
+				Color.MEDIUM_VIOLET_RED
+			)
 			var destination_x: float = line_start_x + i * LETTER_SPACING
 			var start_x: float = -48.0 * GUEST_SCALE
 			var destination_distance: float = destination_x - start_x
@@ -66,4 +106,21 @@ func _ready() -> void:
 					march_speed
 				).set_trans(Tween.TRANS_LINEAR)
 
-			tween.tween_callback(func(): carrier.position.x = destination_x)
+			tween.tween_callback(func():
+				carrier.position.x = destination_x
+				carrier.is_in_place = true
+
+				arrived_guests += 1
+
+				if arrived_guests >= total_guests:
+					letter.show()
+			)
+
+
+func _on_letter_opened() -> void:
+	letter_popup.popup_centered()
+
+
+func _close_letter_popup() -> void:
+	letter_popup.hide()
+	letter.reset_letter()
