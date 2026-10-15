@@ -4,7 +4,6 @@
 
 [node name="Party" type="Node2D" unique_id=1003721101]
 script = ExtResource("1_7h35c")
-march_duration = 6.0
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=488029318]
 offset_right = 1920.0
@@ -15,8 +14,7 @@ color = Color(0.58392996, 0.84735125, 0.93838406, 1)
 position = Vector2(960, 540)
 
 [node name="Guests" type="Node2D" parent="." unique_id=949562433]
-position = Vector2(24, 1032)
-scale = Vector2(3.5, 3.5)
+position = Vector2(0, 216)
 
 [node name="BirthdayMsg" type="Label" parent="." unique_id=1953480093]
 offset_right = 40.0
