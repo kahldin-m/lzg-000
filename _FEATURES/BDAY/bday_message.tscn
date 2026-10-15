@@ -45,10 +45,19 @@ modulate = Color(0, 0, 0, 1)
 layout_mode = 2
 size_flags_vertical = 3
 offset_transform_enabled = true
+offset_transform_scale = Vector2(0.95, 0.95)
 theme_override_colors/default_color = Color(0.3372549, 0.20784314, 0.23921569, 1)
 theme_override_font_sizes/normal_font_size = 22
 text = "Dear Céline,
 
 	Good morning and Happy 26th!!
-	"
+
+	I hope this new year of your life brings you moments of peace , things to smile about and reminders that I love you.
+
+	I'm so grateful that you're a part of my life Céline. Even with the distance between us , you've become someone very dear to me , and I look forward to the day I can celebrate your birthday with you in person.
+
+	For today , I hope you get to spoil yourself a bit and have some fun before work. I look forward to hanging out together soon.
+
+	I love you Céline. Happy birthday. ♥
+	- Marcus"
 shortcut_keys_enabled = false
