@@ -7,6 +7,8 @@
 [ext_resource type="AudioStream" uid="uid://cra3y0v1hp4au" path="res://_FEATURES/BDAY/sounds/angles.wav" id="4_ryu0h"]
 [ext_resource type="FontFile" uid="uid://it27b60ns04c" path="res://PixelOperator8.ttf" id="6_fx2yd"]
 [ext_resource type="FontFile" uid="uid://sewjjhw4ha2v" path="res://NotoColorEmoji-Regular.ttf" id="7_w3oed"]
+[ext_resource type="Texture2D" uid="uid://b0gvvw6l2gqun" path="res://_FEATURES/BDAY/music_note.png" id="7_wipll"]
+[ext_resource type="Texture2D" uid="uid://r3li1f6nfjp2" path="res://_FEATURES/BDAY/popper.png" id="8_w3oed"]
 
 [node name="Party" type="Node2D" unique_id=1003721101]
 script = ExtResource("1_7h35c")
@@ -58,7 +60,25 @@ offset_right = 245.0
 offset_bottom = 993.00006
 scale = Vector2(2, 2)
 theme_override_fonts/font = ExtResource("6_fx2yd")
-text = "🎵 LET'S PARTY!!! 🎉"
+text = "   LET'S PARTY!!!    "
+
+[node name="Lefty" type="TextureRect" parent="PartyButton" unique_id=1949131424]
+layout_mode = 0
+offset_left = 0.5
+offset_top = 2.5
+offset_right = 618.5
+offset_bottom = 620.5
+scale = Vector2(0.04, 0.04)
+texture = ExtResource("7_wipll")
+
+[node name="Righty" type="TextureRect" parent="PartyButton" unique_id=989375487]
+layout_mode = 0
+offset_left = 207.0
+offset_top = -1.5
+offset_right = 825.0
+offset_bottom = 616.5
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("8_w3oed")
 
 [node name="ConfettiButton" type="Button" parent="." unique_id=945822318]
 oversampling_with_scale = 2
@@ -66,7 +86,7 @@ offset_left = 1711.0
 offset_top = 899.0
 offset_right = 1763.0
 offset_bottom = 944.0
-scale = Vector2(4, 4)
+scale = Vector2(0.2, 0.2)
 theme_override_fonts/font = ExtResource("7_w3oed")
-text = "🎉"
+icon = ExtResource("8_w3oed")
 flat = true

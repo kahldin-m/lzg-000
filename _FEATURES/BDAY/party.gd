@@ -5,6 +5,19 @@ const GUEST_SCENE: PackedScene = preload("res://_FEATURES/BDAY/bday_entity.tscn"
 const LETTER_SCENE: PackedScene = preload("res://_FEATURES/BDAY/birthday_letter.tscn")
 const POPUP_SCENE: PackedScene = preload("res://_FEATURES/BDAY/bday_message.tscn")
 const CONFETTI_CANNON_SCENE: PackedScene = preload("res://_FEATURES/BDAY/confetti_cannon.tscn")
+@onready var music_lefty: TextureRect = $PartyButton/Lefty
+@onready var music_righty: TextureRect = $PartyButton/Righty
+
+const PAUSE_PLAY_ICON: Texture2D = preload(
+	"res://_FEATURES/BDAY/pause_play.png"
+)
+const MUSIC_NOTE_ICON: Texture2D = preload(
+	"res://_FEATURES/BDAY/music_note.png"
+)
+const POPPER_ICON: Texture2D = preload(
+	"res://_FEATURES/BDAY/popper.png"
+)
+
 const MESSAGES: Array[String] = [
 	"Happy Birthday",
 	"Céline!"
@@ -275,10 +288,10 @@ func _drop_envelope() -> void:
 func _on_music_button_pressed() -> void:
 	if music_player.stream_paused:
 		music_player.stream_paused = false
-		music_button.text = "⏸ Take a break"
+		_set_music_button_state(" Take a break ", true, false, true)
 	elif music_player.playing:
 		music_player.stream_paused = true
-		music_button.text = "🎶 Resume Music!"
+		_set_music_button_state(" Resume Music! ", true, false, true)
 	else:
 		music_started = true
 		beat_drop_triggered = false
@@ -289,7 +302,7 @@ func _on_music_button_pressed() -> void:
 			guest.start_music_celebration()
 
 		music_player.play()
-		music_button.text = "⏸ Take a break"
+		_set_music_button_state(" Take a break ", true, false, true)
 
 
 func _on_music_finished() -> void:
@@ -301,7 +314,7 @@ func _on_music_finished() -> void:
 	$Fireworks.stop()
 	confetti_button.hide()
 
-	music_button.text = "🎵 One more time!"
+	_set_music_button_state(" One more time! ", true, true, false)
 
 	for guest in $Guests.get_children():
 		guest.reset_celebration()
@@ -378,3 +391,24 @@ func _fire_confetti_cannons() -> void:
 
 	await retreat.finished
 	cannons_busy = false
+
+
+
+
+func _set_music_button_state(
+	button_text: String,
+	show_left: bool,
+	show_right: bool,
+	use_pause_icon: bool
+) -> void:
+	music_lefty.texture = PAUSE_PLAY_ICON if use_pause_icon else MUSIC_NOTE_ICON
+	music_righty.texture = PAUSE_PLAY_ICON if use_pause_icon else POPPER_ICON
+
+	music_lefty.visible = show_left
+	music_righty.visible = show_right
+
+	music_button.text = (
+		("   " if show_left else "")
+		+ button_text
+		+ ("   " if show_right else "")
+	)

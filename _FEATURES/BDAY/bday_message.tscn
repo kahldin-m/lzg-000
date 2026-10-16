@@ -48,6 +48,7 @@ offset_transform_enabled = true
 offset_transform_scale = Vector2(0.95, 0.95)
 theme_override_colors/default_color = Color(0.3372549, 0.20784314, 0.23921569, 1)
 theme_override_font_sizes/normal_font_size = 22
+bbcode_enabled = true
 text = "Dear Céline,
 
 	Good morning and Happy 26th!! Lez gooo!!
@@ -58,6 +59,6 @@ text = "Dear Céline,
 
   I can't wait until I can celebrate your birthday with you in person my dear.  For now , I hope you get to spoil yourself a little bit and have some fun before work. Good luck with everything else today. I look forward to hanging out with you soon!
 
-	I love you Céline. Happy birthday. ♥
+	I love you Céline. Happy birthday. [img=24x24]res://_FEATURES/BDAY/heart.png[/img]
 	- Marcus"
 shortcut_keys_enabled = false
