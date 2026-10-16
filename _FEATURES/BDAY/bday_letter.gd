@@ -28,6 +28,7 @@ func _input_event(
 				return
 
 			is_opening = true
+			$OpenSound.play()
 			sprite.play("open")
 			label.hide()
 

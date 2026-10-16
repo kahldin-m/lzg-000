@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cv5lcgovfdxm7"]
+
+[node name="ConfettiCannon" type="Node2D" unique_id=1072376803]
+
+[node name="Barrel" type="Polygon2D" parent="." unique_id=1654645502]
+
+[node name="Confetti" type="GPUParticles2D" parent="." unique_id=1350156493]

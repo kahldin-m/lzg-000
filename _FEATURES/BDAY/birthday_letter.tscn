@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://deoflcxbm6bui" path="res://_FEATURES/BDAY/bday_letter.gd" id="1_8q7ir"]
 [ext_resource type="Texture2D" uid="uid://cj3wwy4baaxvd" path="res://_FEATURES/BDAY/letter.png" id="1_utx8t"]
+[ext_resource type="AudioStream" uid="uid://c3u0m3qk8s8b4" path="res://_FEATURES/BDAY/sounds/letter_open.ogg" id="3_d3pha"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_utx8t"]
 atlas = ExtResource("1_utx8t")
@@ -123,3 +124,7 @@ offset_right = 21.0
 offset_bottom = -1.0
 text = "!"
 horizontal_alignment = 1
+
+[node name="OpenSound" type="AudioStreamPlayer" parent="." unique_id=134799036]
+stream = ExtResource("3_d3pha")
+volume_db = -6.0

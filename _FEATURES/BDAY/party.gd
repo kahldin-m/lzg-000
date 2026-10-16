@@ -24,8 +24,28 @@ var letter_popup: PopupPanel
 var close_button: Button
 var popup_layer: CanvasLayer
 
+@onready var footsteps_sound: AudioStreamPlayer = $FootstepsSound
+@onready var envelope_land_sound: AudioStreamPlayer = $EnvelopeLandSound
+@onready var music_player: AudioStreamPlayer = $MusicPlayer
+@onready var music_button: Button = $PartyButton
+
+const BEAT_DROP_TIME: float = 17.1
+const FLIP_CHECK_INTERVAL: float = 1.0
+const BOUNCE_CHECK_INTERVAL: float = 0.5
+
+var flip_timer: float = 0.0
+var bounce_timer: float = 0.0
+var beat_drop_triggered: bool = false
+
+var music_started: bool = false
+
+const FOOTSTEP_INVERVAL: float = 0.24
+
+var footstep_timer: float = 0.0
+var marching: bool = true
 
 func _ready() -> void:
+	music_button.hide()
 	$ColorRect.color = Color.INDIGO
 	$Line1.color = Color.GOLD
 	$Line2.color = Color.GOLD
@@ -50,6 +70,9 @@ func _ready() -> void:
 	letter_popup.hide()
 	close_button.pressed.connect(_close_letter_popup)
 	letter_popup.close_requested.connect(_close_letter_popup)
+
+	# music_button connection
+	music_button.pressed.connect(_on_music_button_pressed)
 
 	for message in MESSAGES:
 		total_guests += message.length()
@@ -114,8 +137,22 @@ func _ready() -> void:
 				arrived_guests += 1
 
 				if arrived_guests >= total_guests:
+					marching = false
+					footsteps_sound.stop()
 					_drop_envelope()
 			)
+
+
+func _process(delta: float) -> void:
+	if not marching:
+		_process_celebration(delta)
+		return
+
+	footstep_timer += delta
+
+	if footstep_timer >= FOOTSTEP_INVERVAL:
+		footstep_timer = 0.0
+		footsteps_sound.play()
 
 
 func _on_letter_opened() -> void:
@@ -125,6 +162,7 @@ func _on_letter_opened() -> void:
 func _close_letter_popup() -> void:
 	letter_popup.hide()
 	letter.reset_letter()
+	music_button.show()
 
 
 func _drop_envelope() -> void:
@@ -140,6 +178,8 @@ func _drop_envelope() -> void:
 		landing_y,
 		0.9
 	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+
+	tween.tween_callback(envelope_land_sound.play)
 
 	tween.tween_property(
 		letter,
@@ -192,3 +232,45 @@ func _drop_envelope() -> void:
 		letter.can_click = true
 		letter.label.show()
 	)
+
+# music button pressed ?
+func _on_music_button_pressed() -> void:
+	if music_player.playing:
+		music_player.stream_paused = true
+		music_button.text = "🎶 Resume Music!"
+	elif music_started:
+		music_player.stream_paused = false
+		music_button.text = "🔇 Pause Music"
+	else:
+		music_player.play()
+		music_started = true
+		for guest in $Guests.get_children():
+			guest.start_music_celebration()
+		music_button.text = "🔇 Pause Music"
+
+
+
+func _process_celebration(delta: float) -> void:
+	if not music_started or not music_player.playing or music_player.stream_paused:
+		return
+
+	var music_time: float = music_player.get_playback_position()
+
+	if not beat_drop_triggered and music_time >= BEAT_DROP_TIME:
+		beat_drop_triggered = true
+
+		for guest in $Guests.get_children():
+			guest.start_beat_drop()
+
+	flip_timer += delta
+	if flip_timer >= FLIP_CHECK_INTERVAL:
+		flip_timer = 0.0
+
+		for guest in $Guests.get_children():
+			guest.trigger_flip_chance()
+
+	if beat_drop_triggered:
+		bounce_timer = 0.0
+
+		for guest in $Guests.get_children():
+			guest.trigger_bounce_chance()
