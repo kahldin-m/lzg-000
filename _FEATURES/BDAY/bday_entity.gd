@@ -23,6 +23,7 @@ func _ready() -> void:
 	sprite.frame_coords.x = 0
 
 
+
 func _process(delta: float) -> void:
 	animation_timer += delta
 
@@ -95,3 +96,12 @@ func try_bounce() -> void:
 	bounce_tween.tween_property(
 		sprite, "position:y", original_y, 0.12
 	)
+
+
+func reset_celebration() -> void:
+	music_started = false
+	beat_drop_reached = false
+	sprite.flip_h = false
+
+	if bounce_tween and bounce_tween.is_running():
+		bounce_tween.kill()

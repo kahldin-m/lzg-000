@@ -4,6 +4,7 @@ extends Node2D
 const GUEST_SCENE: PackedScene = preload("res://_FEATURES/BDAY/bday_entity.tscn")
 const LETTER_SCENE: PackedScene = preload("res://_FEATURES/BDAY/birthday_letter.tscn")
 const POPUP_SCENE: PackedScene = preload("res://_FEATURES/BDAY/bday_message.tscn")
+const CONFETTI_CANNON_SCENE: PackedScene = preload("res://_FEATURES/BDAY/confetti_cannon.tscn")
 const MESSAGES: Array[String] = [
 	"Happy Birthday",
 	"Céline!"
@@ -33,22 +34,41 @@ const BEAT_DROP_TIME: float = 17.1
 const FLIP_CHECK_INTERVAL: float = 1.0
 const BOUNCE_CHECK_INTERVAL: float = 0.5
 
+# dance
 var flip_timer: float = 0.0
 var bounce_timer: float = 0.0
 var beat_drop_triggered: bool = false
-
 var music_started: bool = false
 
+# footsteps
 const FOOTSTEP_INVERVAL: float = 0.24
-
 var footstep_timer: float = 0.0
 var marching: bool = true
+
+# cannon
+var left_cannon: Node2D
+var right_cannon: Node2D
+
 
 func _ready() -> void:
 	music_button.hide()
 	$ColorRect.color = Color.INDIGO
 	$Line1.color = Color.GOLD
 	$Line2.color = Color.GOLD
+
+	# CANNON STUFF
+	left_cannon = CONFETTI_CANNON_SCENE.instantiate()
+	right_cannon = CONFETTI_CANNON_SCENE.instantiate()
+
+	add_child(left_cannon)
+	add_child(right_cannon)
+
+	left_cannon.position = Vector2(-180, 600)
+	right_cannon.position = Vector2(2100, 600)
+
+	right_cannon.rotation = -45.0
+	# END CANNON STUFF
+
 
 	letter = LETTER_SCENE.instantiate()
 	add_child(letter)
@@ -73,6 +93,7 @@ func _ready() -> void:
 
 	# music_button connection
 	music_button.pressed.connect(_on_music_button_pressed)
+	music_player.finished.connect(_on_music_finished)
 
 	for message in MESSAGES:
 		total_guests += message.length()
@@ -168,7 +189,7 @@ func _close_letter_popup() -> void:
 func _drop_envelope() -> void:
 	letter.show()
 
-	var landing_y: float = (1080.0 / 2) + 100
+	var landing_y: float = (1080.0 / 2) + 390
 	var tween := create_tween()
 
 	# Fall and hit the "ground"
@@ -235,20 +256,34 @@ func _drop_envelope() -> void:
 
 # music button pressed ?
 func _on_music_button_pressed() -> void:
-	if music_player.playing:
+	if music_player.playing and not music_player.stream_paused:
 		music_player.stream_paused = true
 		music_button.text = "🎶 Resume Music!"
-	elif music_started:
+	elif music_player.playing and music_player.stream_paused:
 		music_player.stream_paused = false
-		music_button.text = "🔇 Pause Music"
+		music_button.text = "⏸ Pause Music"
 	else:
 		music_player.play()
 		music_started = true
-		for guest in $Guests.get_children():
-			guest.start_music_celebration()
-		music_button.text = "🔇 Pause Music"
+
+	for guest in $Guests.get_children():
+		guest.start_music_celebration()
+
+	music_button.text = "⏸ Pause Music"
 
 
+func _on_music_finished() -> void:
+	music_started = false
+	beat_drop_triggered = false
+	flip_timer = 0.0
+	bounce_timer = 0.0
+
+	$Fireworks.stop()
+
+	music_button.text = "🎵 Replay Music"
+
+	for guest in $Guests.get_children():
+		guest.reset_celebration()
 
 func _process_celebration(delta: float) -> void:
 	if not music_started or not music_player.playing or music_player.stream_paused:
@@ -258,6 +293,8 @@ func _process_celebration(delta: float) -> void:
 
 	if not beat_drop_triggered and music_time >= BEAT_DROP_TIME:
 		beat_drop_triggered = true
+		$Fireworks.start()
+		_fire_confetti_cannons()
 
 		for guest in $Guests.get_children():
 			guest.start_beat_drop()
@@ -274,3 +311,45 @@ func _process_celebration(delta: float) -> void:
 
 		for guest in $Guests.get_children():
 			guest.trigger_bounce_chance()
+
+
+
+func _fire_confetti_cannons() -> void:
+	var tween := create_tween().set_parallel(true)
+
+	tween.tween_property(
+		left_cannon,
+		"position:x",
+		50.0,
+		0.5
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	tween.tween_property(
+		right_cannon,
+		"position:x",
+		1920.0,
+		0.5
+	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	await tween.finished
+
+	left_cannon.fire()
+	right_cannon.fire()
+
+	await get_tree().create_timer(5.0).timeout
+
+	var retreat := create_tween().set_parallel(true)
+
+	retreat.tween_property(
+		left_cannon,
+		"position:x",
+		-180.0,
+		0.5
+	)
+
+	retreat.tween_property(
+		right_cannon,
+		"position:x",
+		2100,
+		0.5
+	)

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://br3na3lgs0njf"]
+
+[ext_resource type="Script" uid="uid://2nw7iyr8fmce" path="res://_FEATURES/BDAY/firework_burst.gd" id="1_51ovw"]
+
+[node name="FireworkBurst" type="Node2D" unique_id=334254278]
+script = ExtResource("1_51ovw")

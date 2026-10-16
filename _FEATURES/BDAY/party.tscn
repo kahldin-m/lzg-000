@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bhsqx7ejpsfms"]
 
 [ext_resource type="Script" uid="uid://18t3rntnrywd" path="res://_FEATURES/BDAY/party.gd" id="1_7h35c"]
+[ext_resource type="Script" uid="uid://cp4blghyv53u0" path="res://_FEATURES/BDAY/fireworks.gd" id="2_qg51e"]
 [ext_resource type="AudioStream" uid="uid://d1ckwevjs6map" path="res://_FEATURES/BDAY/sounds/footsteps.ogg" id="2_ryu0h"]
 [ext_resource type="AudioStream" uid="uid://bfdq8oyhrm6p1" path="res://_FEATURES/BDAY/sounds/letter_fall.ogg" id="3_ryu0h"]
 [ext_resource type="AudioStream" uid="uid://cra3y0v1hp4au" path="res://_FEATURES/BDAY/sounds/angles.wav" id="4_ryu0h"]
@@ -15,6 +16,15 @@ position = Vector2(960, 540)
 offset_right = 1920.0
 offset_bottom = 1080.0
 mouse_filter = 2
+
+[node name="Fireworks" type="Node2D" parent="." unique_id=1938578206]
+script = ExtResource("2_qg51e")
+launch_interval = null
+spawn_area = null
+min_launch_interval = null
+max_launch_interval = null
+min_fireworks_per_tick = null
+max_fireworks_per_tick = null
 
 [node name="Line1" type="ColorRect" parent="." unique_id=387244993]
 offset_top = 200.0
@@ -45,9 +55,9 @@ stream = ExtResource("4_ryu0h")
 volume_db = -6.0
 
 [node name="PartyButton" type="Button" parent="." unique_id=125569305]
-offset_left = 8.0
+offset_left = 57.0
 offset_top = 962.0
-offset_right = 196.0
+offset_right = 245.0
 offset_bottom = 993.00006
 scale = Vector2(2, 2)
 text = "🎵 !PARTY BUTTON! 🎉"

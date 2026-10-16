@@ -1,7 +1,40 @@
 [gd_scene format=3 uid="uid://cv5lcgovfdxm7"]
 
+[ext_resource type="Script" uid="uid://dairxkj2owwa0" path="res://_FEATURES/BDAY/confetti_cannon.gd" id="1_tko5x"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_mo0e6"]
+emission_shape_scale = Vector3(2, 1, 1)
+emission_shape = 3
+emission_box_extents = Vector3(0, 1, 0)
+direction = Vector3(0, -1, 0)
+spread = 15.0
+initial_velocity_min = 700.0
+initial_velocity_max = 700.0
+radial_velocity_min = -250.00002
+radial_velocity_max = 24.999977
+gravity = Vector3(0, 400, 0)
+scale_min = 3.0
+scale_max = 17.44
+color = Color(0.9334359, 0.8910836, 0.3426368, 1)
+hue_variation_min = 0.99999994
+hue_variation_max = 0.99999994
+turbulence_noise_scale = 3.749
+
 [node name="ConfettiCannon" type="Node2D" unique_id=1072376803]
+rotation = 0.7853982
+script = ExtResource("1_tko5x")
 
 [node name="Barrel" type="Polygon2D" parent="." unique_id=1654645502]
+position = Vector2(0, 34)
+color = Color(0.9490196, 0.80784315, 0.49803922, 1)
+polygon = PackedVector2Array(-34, 1, -74, -165, 72, -165, 33, 1)
 
 [node name="Confetti" type="GPUParticles2D" parent="." unique_id=1350156493]
+position = Vector2(0, -124)
+emitting = false
+amount = 100
+lifetime = 5.0
+one_shot = true
+explosiveness = 0.5
+randomness = 0.2
+process_material = SubResource("ParticleProcessMaterial_mo0e6")

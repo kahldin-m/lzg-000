@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://bhsqx7ejpsfms"]
+
+[ext_resource type="Script" uid="uid://18t3rntnrywd" path="res://_FEATURES/BDAY/party.gd" id="1_7h35c"]
+[ext_resource type="Script" uid="uid://cp4blghyv53u0" path="res://_FEATURES/BDAY/fireworks.gd" id="2_qg51e"]
+[ext_resource type="AudioStream" uid="uid://d1ckwevjs6map" path="res://_FEATURES/BDAY/sounds/footsteps.ogg" id="2_ryu0h"]
+[ext_resource type="PackedScene" uid="uid://br3na3lgs0njf" path="res://_FEATURES/BDAY/firework_burst.tscn" id="3_o1ipa"]
+[ext_resource type="AudioStream" uid="uid://bfdq8oyhrm6p1" path="res://_FEATURES/BDAY/sounds/letter_fall.ogg" id="3_ryu0h"]
+[ext_resource type="AudioStream" uid="uid://cra3y0v1hp4au" path="res://_FEATURES/BDAY/sounds/angles.wav" id="4_ryu0h"]
+
+[node name="Party" type="Node2D" unique_id=1003721101]
+script = ExtResource("1_7h35c")
+
+[node name="Fireworks" type="Node2D" parent="." unique_id=1938578206]
+script = ExtResource("2_qg51e")
+
+[node name="FireworkBurst" parent="Fireworks" unique_id=334254278 instance=ExtResource("3_o1ipa")]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1958201609]
+position = Vector2(960, 540)
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=488029318]
+offset_right = 1920.0
+offset_bottom = 1080.0
+mouse_filter = 2
+
+[node name="Line1" type="ColorRect" parent="." unique_id=387244993]
+offset_top = 200.0
+offset_right = 1920.0
+offset_bottom = 216.0
+mouse_filter = 2
+
+[node name="Line2" type="ColorRect" parent="." unique_id=852576225]
+offset_top = 440.0
+offset_right = 1920.0
+offset_bottom = 456.0
+mouse_filter = 2
+
+[node name="Guests" type="Node2D" parent="." unique_id=949562433]
+position = Vector2(0, 216)
+
+[node name="FootstepsSound" type="AudioStreamPlayer" parent="." unique_id=1574685649]
+stream = ExtResource("2_ryu0h")
+volume_db = -2.0
+pitch_scale = 1.2
+
+[node name="EnvelopeLandSound" type="AudioStreamPlayer" parent="." unique_id=759180050]
+stream = ExtResource("3_ryu0h")
+volume_db = -6.0
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=566129166]
+stream = ExtResource("4_ryu0h")
+volume_db = -6.0
+
+[node name="PartyButton" type="Button" parent="." unique_id=125569305]
+offset_left = 8.0
+offset_top = 962.0
+offset_right = 196.0
+offset_bottom = 993.00006
+scale = Vector2(2, 2)
+text = "🎵 !PARTY BUTTON! 🎉"
