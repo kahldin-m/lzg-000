@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="LZG-000"
-run/main_scene="uid://bqfcqen1c1ur4"
+run/main_scene="uid://bhsqx7ejpsfms"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 run/max_fps=30
 config/icon="res://icon.svg"

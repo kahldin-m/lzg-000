@@ -10,6 +10,19 @@ const MESSAGES: Array[String] = [
 	"Céline!"
 ]
 
+
+const PARTY_COLORS: Array[Color] = [
+	Color("#FF4D6D"), # Pink-red
+	Color("#FFD166"), # Golden yellow
+	Color("#06D6A0"), # Mint green
+	Color("#4CC9F0"), # Sky blue
+	Color("#9B5DE5"), # Purple
+	Color("#F15BB5"), # Pink
+	Color("#FFFFFF")  # White
+]
+
+var cannons_busy: bool = false
+
 const GUEST_SCALE: float = 5.0
 const TILE_SIZE: float = 16.0
 const BASE_MARCH_SPEED: float = 0.06
@@ -29,10 +42,11 @@ var popup_layer: CanvasLayer
 @onready var envelope_land_sound: AudioStreamPlayer = $EnvelopeLandSound
 @onready var music_player: AudioStreamPlayer = $MusicPlayer
 @onready var music_button: Button = $PartyButton
+@onready var confetti_button: Button = $ConfettiButton
 
-const BEAT_DROP_TIME: float = 17.1
+const BEAT_DROP_TIME: float = 16.9
 const FLIP_CHECK_INTERVAL: float = 1.0
-const BOUNCE_CHECK_INTERVAL: float = 0.5
+const BOUNCE_CHECK_INTERVAL: float = 0.4
 
 # dance
 var flip_timer: float = 0.0
@@ -63,10 +77,13 @@ func _ready() -> void:
 	add_child(left_cannon)
 	add_child(right_cannon)
 
-	left_cannon.position = Vector2(-180, 600)
-	right_cannon.position = Vector2(2100, 600)
+	left_cannon.position = Vector2(-180, 650)
+	right_cannon.position = Vector2(2100, 650)
 
 	right_cannon.rotation = -45.0
+
+	confetti_button.hide()
+	confetti_button.pressed.connect(_on_confetti_button_pressed)
 	# END CANNON STUFF
 
 
@@ -256,20 +273,23 @@ func _drop_envelope() -> void:
 
 # music button pressed ?
 func _on_music_button_pressed() -> void:
-	if music_player.playing and not music_player.stream_paused:
+	if music_player.stream_paused:
+		music_player.stream_paused = false
+		music_button.text = "⏸ Take a break"
+	elif music_player.playing:
 		music_player.stream_paused = true
 		music_button.text = "🎶 Resume Music!"
-	elif music_player.playing and music_player.stream_paused:
-		music_player.stream_paused = false
-		music_button.text = "⏸ Pause Music"
 	else:
-		music_player.play()
 		music_started = true
+		beat_drop_triggered = false
+		flip_timer = 0.0
+		bounce_timer = 0.0
 
-	for guest in $Guests.get_children():
-		guest.start_music_celebration()
+		for guest in $Guests.get_children():
+			guest.start_music_celebration()
 
-	music_button.text = "⏸ Pause Music"
+		music_player.play()
+		music_button.text = "⏸ Take a break"
 
 
 func _on_music_finished() -> void:
@@ -279,8 +299,9 @@ func _on_music_finished() -> void:
 	bounce_timer = 0.0
 
 	$Fireworks.stop()
+	confetti_button.hide()
 
-	music_button.text = "🎵 Replay Music"
+	music_button.text = "🎵 One more time!"
 
 	for guest in $Guests.get_children():
 		guest.reset_celebration()
@@ -293,6 +314,7 @@ func _process_celebration(delta: float) -> void:
 
 	if not beat_drop_triggered and music_time >= BEAT_DROP_TIME:
 		beat_drop_triggered = true
+		confetti_button.show()
 		$Fireworks.start()
 		_fire_confetti_cannons()
 
@@ -313,16 +335,24 @@ func _process_celebration(delta: float) -> void:
 			guest.trigger_bounce_chance()
 
 
+func _on_confetti_button_pressed() -> void:
+	_fire_confetti_cannons()
+
 
 func _fire_confetti_cannons() -> void:
+	if cannons_busy:
+			return
+
+	cannons_busy = true
+
 	var tween := create_tween().set_parallel(true)
 
 	tween.tween_property(
 		left_cannon,
 		"position:x",
-		50.0,
+		-20.0,
 		0.5
-	).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 	tween.tween_property(
 		right_cannon,
@@ -333,23 +363,18 @@ func _fire_confetti_cannons() -> void:
 
 	await tween.finished
 
-	left_cannon.fire()
-	right_cannon.fire()
+	left_cannon.fire(PARTY_COLORS.pick_random())
+	right_cannon.fire(PARTY_COLORS.pick_random())
 
 	await get_tree().create_timer(5.0).timeout
 
+	if not is_inside_tree():
+			return
+
 	var retreat := create_tween().set_parallel(true)
 
-	retreat.tween_property(
-		left_cannon,
-		"position:x",
-		-180.0,
-		0.5
-	)
+	retreat.tween_property(left_cannon,	"position:x", -180.0, 0.5)
+	retreat.tween_property(right_cannon, "position:x", 2100, 0.5)
 
-	retreat.tween_property(
-		right_cannon,
-		"position:x",
-		2100,
-		0.5
-	)
+	await retreat.finished
+	cannons_busy = false

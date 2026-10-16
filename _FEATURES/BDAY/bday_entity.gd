@@ -80,7 +80,7 @@ func trigger_bounce_chance() -> void:
 	if not beat_drop_reached or not is_in_place:
 		return
 
-	if randi_range(1, 100) <= 2:
+	if randi_range(1, 100) <= 5:
 		try_bounce()
 
 

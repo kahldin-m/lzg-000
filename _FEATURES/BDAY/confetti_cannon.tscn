@@ -16,8 +16,6 @@ gravity = Vector3(0, 400, 0)
 scale_min = 3.0
 scale_max = 17.44
 color = Color(0.9334359, 0.8910836, 0.3426368, 1)
-hue_variation_min = 0.99999994
-hue_variation_max = 0.99999994
 turbulence_noise_scale = 3.749
 
 [node name="ConfettiCannon" type="Node2D" unique_id=1072376803]

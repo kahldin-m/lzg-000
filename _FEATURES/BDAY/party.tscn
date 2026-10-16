@@ -19,12 +19,6 @@ mouse_filter = 2
 
 [node name="Fireworks" type="Node2D" parent="." unique_id=1938578206]
 script = ExtResource("2_qg51e")
-launch_interval = null
-spawn_area = null
-min_launch_interval = null
-max_launch_interval = null
-min_fireworks_per_tick = null
-max_fireworks_per_tick = null
 
 [node name="Line1" type="ColorRect" parent="." unique_id=387244993]
 offset_top = 200.0
@@ -60,4 +54,13 @@ offset_top = 962.0
 offset_right = 245.0
 offset_bottom = 993.00006
 scale = Vector2(2, 2)
-text = "🎵 !PARTY BUTTON! 🎉"
+text = "🎵 LET'S PARTY!!! 🎉"
+
+[node name="ConfettiButton" type="Button" parent="." unique_id=945822318]
+offset_left = 1711.0
+offset_top = 899.0
+offset_right = 1763.0
+offset_bottom = 944.0
+scale = Vector2(4, 4)
+text = "🎉"
+flat = true
