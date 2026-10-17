@@ -72,6 +72,7 @@ scale = Vector2(0.04, 0.04)
 texture = ExtResource("7_wipll")
 
 [node name="Righty" type="TextureRect" parent="PartyButton" unique_id=989375487]
+oversampling_with_scale = 1
 layout_mode = 0
 offset_left = 207.0
 offset_top = -1.5
@@ -82,10 +83,11 @@ texture = ExtResource("8_w3oed")
 
 [node name="ConfettiButton" type="Button" parent="." unique_id=945822318]
 oversampling_with_scale = 2
-offset_left = 1711.0
-offset_top = 899.0
-offset_right = 1763.0
-offset_bottom = 944.0
+offset_left = 1740.0
+offset_top = 1027.0
+offset_right = 2366.0
+offset_bottom = 1653.0
+rotation = -1.5707964
 scale = Vector2(0.2, 0.2)
 theme_override_fonts/font = ExtResource("7_w3oed")
 icon = ExtResource("8_w3oed")
